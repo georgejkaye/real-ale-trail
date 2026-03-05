@@ -2,8 +2,17 @@ networks:
   internal:
     external: false
 services:
+  data:
+    build:
+      context: data
+      dockerfile: Dockerfile
+    volumes:
+      - ./db:/db
   db:
     image: postgres
+    depends_on:
+      data:
+        condition: service_completed_successfully
     environment:
       POSTGRES_USER: realaletrail
       POSTGRES_DB: realaletrail
@@ -12,7 +21,7 @@ services:
       - 5432:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./db/scripts/:/docker-entrypoint-initdb.d/
+      - ./db/.populate/:/docker-entrypoint-initdb.d/
     networks:
       - internal
     healthcheck:
@@ -33,8 +42,8 @@ services:
       WATCH_FILES: 1
       ROLL_SCRIPTS: 1
       DB_HOST: db
-      DB_USER: transport
-      DB_NAME: transport
+      DB_USER: realaletrail
+      DB_NAME: realaletrail
       DB_PASSWORD_FILE: /run/secrets/db_secret
     volumes:
       - ./db/code:/app/input
