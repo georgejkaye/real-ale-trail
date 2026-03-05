@@ -1,0 +1,106 @@
+networks:
+  internal:
+    external: false
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: realaletrail
+      POSTGRES_DB: realaletrail
+      POSTGRES_PASSWORD: realaletrail
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/scripts/:/docker-entrypoint-initdb.d/
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 1s
+      timeout: 1s
+      retries: 500
+      start_period: 0s
+  codegen:
+    build:
+      context: codegen
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      OUTPUT_MODULE_NAME: api.db
+      WATCH_FILES: 1
+      ROLL_SCRIPTS: 1
+      DB_HOST: db
+      DB_USER: transport
+      DB_NAME: transport
+      DB_PASSWORD_FILE: /run/secrets/db_secret
+    volumes:
+      - ./db/code:/app/input
+      - ./api/src/api:/app/output
+    networks:
+      - internal
+
+#   api:
+#     depends_on:
+#       db:
+#         condition: service_healthy
+#     build:
+#       context: api
+#       dockerfile: Dockerfile.dev
+#       args:
+#         POETRY_VERSION: 2.1.3
+#     ports:
+#       - ${API_PORT:-8000}:${API_PORT:-8000}
+#     environment:
+#       API_ENV: dev
+#       API_PORT: ${API_PORT:-8000}
+#       CLIENT_HOST: ${CLIENT_HOST:-localhost:3000}
+#       CLIENT_PROTOCOL: ${CLIENT_PROTOCOL:-http}
+#       DB_HOST: db
+#       DB_NAME: bbf
+#       DB_USER: bbf
+#       DB_PASSWORD: /run/secrets/db_secret
+#       FROM_EMAIL: ${FROM_EMAIL}
+#       SMTP_SERVER: ${SMTP_SERVER}
+#       SMTP_PORT: ${SMTP_PORT}
+#       SMTP_USER: ${SMTP_USER}
+#       SMTP_PASSWORD: /run/secrets/smtp_secret
+#       USER_SECRET: /run/secrets/user_secret
+#     volumes:
+#       - ./api/src:/app/src
+#     secrets:
+#       - smtp_secret
+#     networks:
+#       - internal
+#     healthcheck:
+#       test: ["CMD-SHELL", "curl --fail http://localhost:$$API_PORT/ || exit 1"]
+#       interval: 10s
+#       timeout: 1s
+#       retries: 100
+#       start_period: 0s
+#   client:
+#     depends_on:
+#       api:
+#         condition: service_healthy
+#     build:
+#       context: client
+#       dockerfile: Dockerfile.dev
+#       args:
+#         CLIENT_PORT: ${CLIENT_PORT:-3000}
+#         API_PROTOCOL: ${API_PROTOCOL:-http}
+#         API_HOST: ${API_HOST:-api:8000}
+#     ports:
+#       - ${CLIENT_PORT:-3000}:${CLIENT_PORT:-3000}
+#     volumes:
+#       - ./client/src:/app/src
+#       - ./client/public:/app/public
+#     networks:
+#       - internal
+# secrets:
+#   smtp_secret:
+#     file: smtp.secret
+
+volumes:
+  pgdata:
