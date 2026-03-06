@@ -1,0 +1,26 @@
+[
+    {
+        "name": "The Wellington",
+        "address": "37 Bennetts Hill, Birmingham B2 5SN",
+        "latitude": 52.480626,
+        "longitude": -1.900479
+    },
+    {
+        "name": "The Jewellers Arms",
+        "address": "23 Hockley St, Birmingham B18 6BW",
+        "latitude": 52.489556,
+        "longitude": -1.911332
+    },
+    {
+        "name": "The Prince of Wales",
+        "address": "84 Cambridge St, Birmingham B1 2NP",
+        "latitude": 52.479488,
+        "longitude": -1.911650
+    },
+    {
+        "name": "The Craven Arms",
+        "address": "47 Upper Gough St, Birmingham B1 1JL",
+        "latitude": 52.475075,
+        "longitude": -1.903778
+    }
+]

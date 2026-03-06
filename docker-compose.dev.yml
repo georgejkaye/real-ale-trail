@@ -2,16 +2,16 @@ networks:
   internal:
     external: false
 services:
-  data:
+  init:
     build:
-      context: data
+      context: db
       dockerfile: Dockerfile
     volumes:
       - ./db:/db
   db:
     image: postgres
     depends_on:
-      data:
+      init:
         condition: service_completed_successfully
     environment:
       POSTGRES_USER: realaletrail
@@ -30,6 +30,19 @@ services:
       timeout: 1s
       retries: 500
       start_period: 0s
+  data:
+    build:
+      context: data
+      dockerfile: Dockerfile
+      args:
+        POETRY_VERSION: 2.3.0
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./api:/app/api
+    networks:
+      - internal
   codegen:
     build:
       context: codegen
