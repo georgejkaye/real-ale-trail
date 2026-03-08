@@ -4,7 +4,7 @@ import { useContext, useState } from "react"
 import { UserContext } from "./context/user"
 
 const TopBar = () => {
-  const linkStyle = "hover:underline cursor-pointer"
+  const linkStyle = "text-white hover:underline cursor-pointer"
   const { user, isLoadingUser, setToken } = useContext(UserContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
   const onClickLogout = () => {
@@ -72,7 +72,7 @@ const TopBar = () => {
         )}
       </div>
       {isMenuOpen && (
-        <div className="absolute z-999 top-[60px] left-0 bg-green-300 p-4 flex flex-col gap-3 items-end w-full">
+        <div className="absolute z-999 text-white top-[60px] left-0 bg-[#282e54] p-4 flex flex-col gap-3 items-end w-full">
           <Link className={linkStyle} onClick={onClickLink} href="/">
             Map
           </Link>
