@@ -110,7 +110,7 @@ CREATE OR REPLACE FUNCTION insert_visit (
     p_rating INTEGER,
     p_drink TEXT
 )
-RETURNS INTEGER
+RETURNS insert_visit_result
 LANGUAGE sql
 AS
 $$
