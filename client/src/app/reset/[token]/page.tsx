@@ -1,5 +1,5 @@
 "use client"
-import { resetPassword } from "@/app/api"
+import client from "@/app/api/client"
 import { SubmitButton, TextInput } from "@/app/components/forms"
 import { Loader } from "@/app/components/Loader"
 import { use, useState, MouseEvent, KeyboardEvent } from "react"
@@ -7,19 +7,19 @@ import { use, useState, MouseEvent, KeyboardEvent } from "react"
 const Page = ({ params }: { params: Promise<{ token: string }> }) => {
   const { token } = use(params)
 
-  const [isLoading, setLoading] = useState(false)
   const [errorString, setErrorString] = useState("")
   const [successString, setSuccessString] = useState("")
   const [newPasswordString, setNewPasswordString] = useState("")
   const [confirmNewPasswordString, setConfirmNewPasswordString] = useState("")
 
+  const { mutate: postResetPassword, isPending: isPendingReset } =
+    client.useMutation("post", "/auth/reset-password")
+
   const performResetPassword = async () => {
-    setLoading(true)
     if (newPasswordString !== confirmNewPasswordString) {
       setErrorString("Passwords do not match.")
     } else {
       const resetPasswordResult = await resetPassword(token, newPasswordString)
-      console.log(resetPasswordResult)
       if (resetPasswordResult.error) {
         if (resetPasswordResult.error === "RESET_PASSWORD_BAD_TOKEN") {
           setErrorString("Password reset failed: invalid token")

@@ -1,11 +1,11 @@
 "use client"
-import { KeyboardEvent, useContext, useState } from "react"
+import { useContext, useState } from "react"
 import { Loader } from "../components/Loader"
 import { UserContext } from "../context/user"
 import Link from "next/link"
 import { SubmitButton, TextInput } from "../components/forms"
 import { useRouter } from "next/navigation"
-import client from "../api/client"
+import client, { fetchClient } from "../api/client"
 
 interface LoginBoxProps {
   performLogin: (email: string, password: string) => Promise<void>
@@ -18,16 +18,8 @@ const LoginBox = ({ performLogin }: LoginBoxProps) => {
     await performLogin(emailString, passwordString)
     setPasswordString("")
   }
-  const onClickLogin = () => {
-    submitForm()
-  }
-  const onKeyDownPassword = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      submitForm()
-    }
-  }
   return (
-    <div className="w-full flex flex-col gap-4">
+    <form action={submitForm} className="w-full flex flex-col gap-4">
       <div>
         <div>Email</div>
         <div>
@@ -47,16 +39,14 @@ const LoginBox = ({ performLogin }: LoginBoxProps) => {
             type="password"
             value={passwordString}
             setValue={setPasswordString}
-            onKeyDown={onKeyDownPassword}
           />
         </div>
       </div>
       <SubmitButton
         label="Login"
-        onClick={onClickLogin}
         disabled={emailString === "" || passwordString === ""}
       />
-    </div>
+    </form>
   )
 }
 
@@ -95,7 +85,10 @@ const Page = () => {
       client_id: "",
       client_secret: "",
     }
-    postLogin({ body })
+    postLogin({
+      body,
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    })
   }
   return (
     <div className="flex flex-col md:w-1/2 lg:w-1/3 md:mx-auto p-4 items-center">

@@ -54,12 +54,12 @@ const Page = () => {
       mutateRegister({ body })
     }
   }
-  const onClickRegister = () => {
+  const onSubmit = () => {
     performRegister()
   }
   const onKeyDownDisplayName = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      performRegister()
+      //performRegister()
     }
   }
   return (
@@ -75,7 +75,7 @@ const Page = () => {
           {successString && (
             <div className="p-4 bg-green-300 rounded-lg">{successString}</div>
           )}
-          <form action="#" className="flex flex-col gap-4 w-full">
+          <form action={onSubmit} className="flex flex-col gap-4 w-full">
             <div>
               <div>Email</div>
               <div>
@@ -119,7 +119,6 @@ const Page = () => {
             </div>
             <SubmitButton
               label="Register"
-              onClick={onClickRegister}
               disabled={
                 emailString === "" ||
                 passwordString === "" ||

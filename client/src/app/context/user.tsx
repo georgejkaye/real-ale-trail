@@ -20,9 +20,7 @@ export const UserContext = createContext({
 })
 
 export const UserProvider = ({ children }: PropsWithChildren) => {
-  const [token, setToken] = useState<string | undefined>(
-    localStorage.getItem("token") ?? undefined,
-  )
+  const [token, setToken] = useState<string | undefined>(undefined)
 
   const authMiddleware: Middleware = {
     onRequest({ request }) {
@@ -51,6 +49,10 @@ export const UserProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     fetchUser()
   }, [token, fetchUser])
+
+  useEffect(() => {
+    setToken(localStorage.getItem("token") ?? undefined)
+  }, [])
 
   return (
     <UserContext.Provider

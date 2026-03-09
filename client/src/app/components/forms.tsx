@@ -70,20 +70,17 @@ export const TextAreaInput = ({
 
 interface SubmitButtonProps {
   label: string
-  onClick: (e: MouseEvent<HTMLButtonElement>) => void
   disabled?: boolean
 }
 
 export const SubmitButton = ({
   label,
-  onClick,
   disabled = false,
 }: SubmitButtonProps) => {
   return (
     <button
       type="submit"
       className="font-bold text-white p-2 rounded bg-[#282e54] cursor-pointer hover:bg-[#404880] disabled:bg-[#8d93b8] disabled:cursor-not-allowed"
-      onClick={onClick}
       disabled={disabled}
     >
       {label}
