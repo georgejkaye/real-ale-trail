@@ -7,6 +7,8 @@ then
     mkdir $DB_POPULATE_DIR
 fi
 
+rm $DB_POPULATE_DIR/*
+
 DB_SCHEMA_DIR="/db/schema"
 
 if [ ! -d $DB_SCHEMA_DIR ]
