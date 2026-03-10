@@ -119,7 +119,7 @@ const VenueVisitCard = ({ visit }: VenueVisitProps) => {
     ? new Date(Date.parse(visit.visit_date))
     : undefined
   return (
-    <div className="rounded p-2 bg-green-200 flex flex-col gap-2">
+    <div className="rounded p-4 bg-accenthover text-accentfg flex flex-col gap-2">
       <div className="font-bold text-xl">
         <Link href={`/users/${visit.user_id}`}>{visit.user_display_name}</Link>
       </div>
