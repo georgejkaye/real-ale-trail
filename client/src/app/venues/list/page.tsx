@@ -23,15 +23,16 @@ const VenueCard = ({ venue, location }: VenueCardProps) => {
     visitCount === 0
       ? 0
       : venue.visits.reduce((a, b) => a + (b.rating ?? 0), 0) / visitCount
+  const distanceToVenue = location
+    ? getDistanceToVenue(venue, location)
+    : undefined
   return (
     <Link href={`/venues/${venue.venue_id}`}>
       <div className="p-4 flex md:flex-row items-end gap-4 bg-accent text-accentfg rounded-lg shadow hover:bg-accenthover">
         <div className="flex flex-col flex-1 gap-2">
           <div className="text-2xl font-bold">{venue.venue_name}</div>
           <div>{venue.venue_address}</div>
-          {location && (
-            <div>{getDistanceToVenue(venue, location).toFixed(2)}km away</div>
-          )}
+          {distanceToVenue && <div>{distanceToVenue}km away</div>}
           <div>{visitCount} visits</div>
           <Rating
             style={{ maxWidth: 100 }}
@@ -71,7 +72,9 @@ const Page = () => {
       if (!location) {
         return 0
       } else {
-        return getDistanceToVenue(a, location) - getDistanceToVenue(b, location)
+        const aDistance = getDistanceToVenue(a, location)
+        const bDistance = getDistanceToVenue(b, location)
+        return aDistance && bDistance ? bDistance - aDistance : 0
       }
     },
     [location],
@@ -81,7 +84,9 @@ const Page = () => {
       if (!location) {
         return 0
       } else {
-        return getDistanceToVenue(a, location) - getDistanceToVenue(b, location)
+        const aDistance = getDistanceToVenue(a, location)
+        const bDistance = getDistanceToVenue(b, location)
+        return aDistance && bDistance ? aDistance - bDistance : 0
       }
     },
     [location],

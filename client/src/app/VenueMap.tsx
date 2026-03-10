@@ -150,9 +150,12 @@ const CurrentVenueBox = ({
             readOnly={true}
           />
         </div>
-        {firstVisitToVenue && (
+        {firstVisitToVenue && firstVisitToVenue.visit_date && (
           <div>
-            You visited on {firstVisitToVenue.visitDate.toLocaleDateString()}
+            You visited on{" "}
+            {new Date(
+              Date.parse(firstVisitToVenue.visit_date),
+            ).toLocaleDateString()}
           </div>
         )}
         <div className="flex flex-col gap-2">
