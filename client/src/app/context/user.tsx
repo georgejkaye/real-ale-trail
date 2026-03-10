@@ -36,7 +36,7 @@ export const UserProvider = ({ children }: PropsWithChildren) => {
     {
       headers: { Authorization: `Bearer ${token}` },
     },
-    { refetchOnMount: false, enabled: hasToken, retry: hasToken },
+    { refetchOnMount: false, enabled: hasToken, retry: false },
   )
 
   useEffect(() => {
