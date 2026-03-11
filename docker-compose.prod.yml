@@ -93,7 +93,7 @@ services:
       - ./client/src/app/api:/app/output
   client:
     depends_on:
-      client:
+      api:
         condition: service_healthy
       openapi:
         condition: service_completed_successfully
