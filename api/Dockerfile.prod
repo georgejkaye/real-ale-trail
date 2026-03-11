@@ -23,6 +23,7 @@ FROM python:3.14-slim-bookworm AS runtime
 
 RUN apt update
 RUN apt install libpq-dev -y
+RUN apt install curl
 
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH" \
