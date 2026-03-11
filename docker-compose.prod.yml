@@ -20,9 +20,9 @@ services:
       OUTPUT_MODULE_NAME: api.db
       WATCH_FILES: 0
       ROLL_SCRIPTS: 1
-      DB_HOST: db
-      DB_USER: realaletrail
-      DB_NAME: realaletrail
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_NAME: ${DB_NAME}
       DB_PASSWORD_FILE: /run/secrets/db_secret
     volumes:
       - ./db/code:/app/input
