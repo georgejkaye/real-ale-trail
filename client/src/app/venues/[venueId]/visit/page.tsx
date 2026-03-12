@@ -66,6 +66,7 @@ const Page = () => {
     client.useMutation("post", "/visit", {
       onSuccess: () => {
         router.push("/")
+        return client.invalidateQueries("/venues", "/auth/me")
       },
       onError: (error) => {
         setErrorText(`Could not submit visit: ${error.detail}`)
