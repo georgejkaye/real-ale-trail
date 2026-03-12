@@ -5,6 +5,7 @@ import { Rating } from "@smastrom/react-rating"
 import Link from "next/link"
 import { useContext } from "react"
 import { SingleUserVisit } from "@/app/api/client"
+import { notFound } from "next/navigation"
 
 interface UserSummaryVisitCardProps {
   visit: SingleUserVisit
@@ -41,13 +42,14 @@ const UserSummaryVisitCard = ({ visit }: UserSummaryVisitCardProps) => {
 }
 
 const Page = () => {
-  const { userSummary, isLoadingUserSummary } = useContext(UserSummaryContext)
+  const { userSummary, isLoadingUserSummary, isError } =
+    useContext(UserSummaryContext)
   return (
     <div className="md:w-1/3 flex flex-col items-center md:mx-auto p-4">
       {isLoadingUserSummary ? (
         <Loader />
-      ) : !userSummary ? (
-        ""
+      ) : !userSummary || isError ? (
+        notFound()
       ) : (
         <div className="w-full flex flex-col gap-4">
           <h2 className="font-bold text-2xl">{userSummary.display_name}</h2>
