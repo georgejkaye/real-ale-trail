@@ -34,7 +34,7 @@ const Page = () => {
           <h1 className="font-bold text-2xl">{user.display_name}</h1>
           <div>
             <button
-              className="font-bold p-2 rounded bg-accent text-accentfg cursor-pointer hover:bg-green-200"
+              className="font-bold p-2 rounded bg-accent text-accentfg cursor-pointer hover:bg-accenthover"
               onClick={onClickLogout}
             >
               Logout

@@ -15,7 +15,7 @@ const UserSummaryVisitCard = ({ visit }: UserSummaryVisitCardProps) => {
     ? new Date(Date.parse(visit.visit_date))
     : undefined
   return (
-    <div className="rounded-xl bg-green-200 p-4 flex flex-col gap-2">
+    <div className="rounded-xl bg-accenthover text-accentfg p-4 flex flex-col gap-2">
       <Link
         href={`/venues/${visit.venue_id}`}
         className="font-bold text-xl hover:underline"
