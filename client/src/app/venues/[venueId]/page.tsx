@@ -152,7 +152,7 @@ const VenueVisitCard = ({ visit }: VenueVisitProps) => {
 
 const Page = () => {
   const router = useRouter()
-  const { venue, isLoadingVenue, isError } = useContext(VenueContext)
+  const { venue, isError } = useContext(VenueContext)
   const { user } = useContext(UserContext)
   const onClickRecordVisit = () => {
     router.push(`/venues/${venue?.venue_id}/visit`)

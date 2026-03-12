@@ -1,7 +1,8 @@
 "use client"
 
-import { createContext, PropsWithChildren } from "react"
+import { createContext, PropsWithChildren, useContext } from "react"
 import client, { Venue } from "../api/client"
+import { ClientContext } from "../api/ReactQueryClientProvider"
 
 export const VenueContext = createContext({
   venue: undefined as Venue | undefined,
@@ -13,6 +14,7 @@ export const VenueProvider = ({
   venueId,
   children,
 }: PropsWithChildren<{ venueId: number }>) => {
+  const { client } = useContext(ClientContext)
   const {
     data: venue,
     isLoading: isLoadingVenue,

@@ -7,8 +7,10 @@ import {
   SetStateAction,
   Dispatch,
   useEffect,
+  useContext,
 } from "react"
 import client, { User } from "@/app/api/client"
+import { ClientContext } from "../api/ReactQueryClientProvider"
 
 export const UserContext = createContext({
   token: undefined as string | undefined,
@@ -24,6 +26,7 @@ export const UserProvider = ({ children }: PropsWithChildren) => {
   const [token, setToken] = useState<string | undefined>(undefined)
   const [isRetrievingFromStorage, setRetrievingFromStorage] = useState(true)
   const hasToken = token !== undefined && token !== null && token !== ""
+  const { client } = useContext(ClientContext)
 
   const {
     data,

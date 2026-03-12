@@ -1,11 +1,13 @@
 "use client"
-import { KeyboardEvent, useState } from "react"
+import { KeyboardEvent, useContext, useState } from "react"
 import { SubmitButton, TextInput } from "../components/forms"
 import { Loader } from "../components/Loader"
 import Link from "next/link"
 import client from "../api/client"
+import { ClientContext } from "../api/ReactQueryClientProvider"
 
 const Page = () => {
+  const { client } = useContext(ClientContext)
   const [emailString, setEmailString] = useState("")
   const [displayNameString, setDisplayNameString] = useState("")
   const [passwordString, setPasswordString] = useState("")

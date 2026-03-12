@@ -6,6 +6,7 @@ import Link from "next/link"
 import { SubmitButton, TextInput } from "../components/forms"
 import { useRouter } from "next/navigation"
 import client from "../api/client"
+import { ClientContext } from "../api/ReactQueryClientProvider"
 
 interface LoginBoxProps {
   performLogin: (email: string, password: string) => Promise<void>
@@ -52,6 +53,7 @@ const LoginBox = ({ performLogin }: LoginBoxProps) => {
 
 const Page = () => {
   const { setToken } = useContext(UserContext)
+  const { client } = useContext(ClientContext)
   const router = useRouter()
   const [isLoginSuccessful, setLoginSuccessful] = useState(false)
   const [errorString, setErrorString] = useState("")

@@ -1,12 +1,14 @@
 "use client"
 
 import client from "@/app/api/client"
+import { ClientContext } from "@/app/api/ReactQueryClientProvider"
 import { SubmitButton, TextInput } from "@/app/components/forms"
 import { Loader } from "@/app/components/Loader"
-import { use, useState } from "react"
+import { use, useContext, useState } from "react"
 
 const Page = ({ params }: { params: Promise<{ token: string }> }) => {
   const { token } = use(params)
+  const { client } = useContext(ClientContext)
 
   const [errorString, setErrorString] = useState("")
   const [successString, setSuccessString] = useState("")

@@ -9,6 +9,8 @@ import { Rating } from "@smastrom/react-rating"
 import { SubmitButton, TextAreaInput, TextInput } from "@/app/components/forms"
 import { Loader } from "@/app/components/Loader"
 import client from "@/app/api/client"
+import { QueryClientProvider, useQueryClient } from "@tanstack/react-query"
+import { ClientContext } from "@/app/api/ReactQueryClientProvider"
 
 interface RecordVisitFormProps {
   submitVisit: (notes: string, rating: number, drink: string) => Promise<void>
@@ -54,6 +56,7 @@ const RecordVisitForm = ({ submitVisit }: RecordVisitFormProps) => {
 }
 
 const Page = () => {
+  const { client } = useContext(ClientContext)
   const { token, user, isLoadingUser } = useContext(UserContext)
   const { venue, isLoadingVenue } = useContext(VenueContext)
   const router = useRouter()

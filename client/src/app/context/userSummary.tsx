@@ -1,7 +1,8 @@
 "use client"
 
-import { createContext, PropsWithChildren } from "react"
+import { createContext, PropsWithChildren, useContext } from "react"
 import client, { UserSummary } from "../api/client"
+import { ClientContext } from "../api/ReactQueryClientProvider"
 
 export const UserSummaryContext = createContext({
   userSummary: undefined as UserSummary | undefined,
@@ -13,6 +14,7 @@ export const UserSummaryProvider = ({
   userId,
   children,
 }: PropsWithChildren<{ userId: number }>) => {
+  const { client } = useContext(ClientContext)
   const {
     data: userSummary,
     isLoading: isLoadingUserSummary,
