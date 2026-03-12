@@ -3,7 +3,6 @@ import { KeyboardEvent, useContext, useState } from "react"
 import { SubmitButton, TextInput } from "../components/forms"
 import { Loader } from "../components/Loader"
 import Link from "next/link"
-import client from "../api/client"
 import { ClientContext } from "../api/ReactQueryClientProvider"
 
 const Page = () => {

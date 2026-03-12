@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, PropsWithChildren, useContext } from "react"
-import client, { Venue } from "../api/client"
+import { Venue } from "../api/client"
 import { ClientContext } from "../api/ReactQueryClientProvider"
 
 export const VenuesContext = createContext({

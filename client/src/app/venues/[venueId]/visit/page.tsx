@@ -8,8 +8,6 @@ import { Rating } from "@smastrom/react-rating"
 
 import { SubmitButton, TextAreaInput, TextInput } from "@/app/components/forms"
 import { Loader } from "@/app/components/Loader"
-import client from "@/app/api/client"
-import { QueryClientProvider, useQueryClient } from "@tanstack/react-query"
 import { ClientContext } from "@/app/api/ReactQueryClientProvider"
 
 interface RecordVisitFormProps {

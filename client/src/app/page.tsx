@@ -2,7 +2,7 @@
 import { useContext, useState } from "react"
 import { VenueMap } from "./VenueMap"
 import { UserContext } from "./context/user"
-import client, { Venue } from "./api/client"
+import { Venue } from "./api/client"
 import { Loader } from "./components/Loader"
 import { ClientContext } from "./api/ReactQueryClientProvider"
 

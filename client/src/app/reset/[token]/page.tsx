@@ -1,6 +1,5 @@
 "use client"
 
-import client from "@/app/api/client"
 import { ClientContext } from "@/app/api/ReactQueryClientProvider"
 import { SubmitButton, TextInput } from "@/app/components/forms"
 import { Loader } from "@/app/components/Loader"

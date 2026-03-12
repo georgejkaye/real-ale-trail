@@ -9,7 +9,7 @@ import {
   useEffect,
   useContext,
 } from "react"
-import client, { User } from "@/app/api/client"
+import { User } from "@/app/api/client"
 import { ClientContext } from "../api/ReactQueryClientProvider"
 
 export const UserContext = createContext({

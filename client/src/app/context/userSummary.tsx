@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, PropsWithChildren, useContext } from "react"
-import client, { UserSummary } from "../api/client"
+import { UserSummary } from "../api/client"
 import { ClientContext } from "../api/ReactQueryClientProvider"
 
 export const UserSummaryContext = createContext({
