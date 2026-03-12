@@ -24,7 +24,7 @@ const UserSummaryVisitCard = ({ visit }: UserSummaryVisitCardProps) => {
       </Link>
       {visitDate && (
         <div className="">
-          {visitDate.toLocaleDateString()}
+          {visitDate.toLocaleDateString()}{" "}
           {visitDate.toLocaleTimeString("en-UK", {
             hour: "2-digit",
             minute: "2-digit",
