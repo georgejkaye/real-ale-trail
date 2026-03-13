@@ -107,6 +107,12 @@ services:
     networks:
       - internal
       - web
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:$$CLIENT_PORT/ || exit 1"]
+      interval: 10s
+      timeout: 1s
+      retries: 100
+      start_period: 0s
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.realaletrail_client.rule=Host(`${CLIENT_HOST}`)"
