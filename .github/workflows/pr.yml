@@ -1,0 +1,21 @@
+name: Deploy
+on:
+  pull_request:
+
+jobs:
+  deploy:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v6
+      - name: Create db secret
+        run: echo "realaletrail" > db.secret
+      - name: Create user secret
+        run: echo "user" > user.secret
+      - name: Create smtp secret
+        run: echo "smtp" > smtp.secret
+      - name: Build docker containers
+        run: docker compose -f docker-compose.build.yml up --build --wait
+      - name: Down docker containers
+        run: docker compose down
