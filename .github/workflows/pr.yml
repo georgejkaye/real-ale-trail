@@ -7,16 +7,15 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+      - name: Check out repo
+        uses: actions/checkout@v6
       - name: Create db secret
         run: echo "realaletrail" > db.secret
       - name: Create user secret
         run: echo "user" > user.secret
       - name: Create smtp secret
         run: echo "smtp" > smtp.secret
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
       - name: Build docker containers
         uses: hoverkraft-tech/compose-action@4894d2492015c1774ee5a13a95b1072093087ec3
         with:
-          compose-file: "${{ github.workspace }}/docker-compose.build.yml"
+          compose-file: "docker-compose.build.yml"
