@@ -1,6 +1,4 @@
 networks:
-  web:
-    external: true
   internal:
     external: false
 services:
@@ -108,7 +106,6 @@ services:
       - smtp_secret
     networks:
       - internal
-      - web
     healthcheck:
       test: ["CMD-SHELL", "curl --fail http://localhost:$$API_PORT/ || exit 1"]
       interval: 10s
@@ -131,7 +128,6 @@ services:
       - ${CLIENT_PORT:-3000}:${CLIENT_PORT:-3000}
     networks:
       - internal
-      - web
 secrets:
   smtp_secret:
     file: smtp.secret
