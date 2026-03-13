@@ -12,6 +12,14 @@ WORKDIR /app
 COPY client/package.json client/yarn.lock ./
 RUN yarn --frozen-lockfile
 
+FROM georgejkaye/postgres-codegen:latest AS codegen
+
+WORKDIR /app
+
+COPY db/code code/
+
+RUN poetry run python src/postgrescodegen/main.py /app/code /app/output api.db
+
 FROM python:3.14-bookworm AS openapi-py
 
 ARG POETRY_VERSION
@@ -27,7 +35,8 @@ RUN touch README.md
 COPY api/src /app/src
 RUN poetry install
 
-RUN echo "test" > "secret"
+COPY --from=codegen /app/output /app/src/api/db
+
 RUN poetry run python src/api/genapi.py /app/openapi.json
 
 FROM base AS openapi-ts

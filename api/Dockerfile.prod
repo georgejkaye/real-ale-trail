@@ -37,4 +37,10 @@ COPY src ./app/src
 
 WORKDIR /app
 
+ARG ENV
+
+RUN if [ "$ENV" = "build" ]; then \
+    echo "realaletrail" > /app/db.secret; \
+    fi
+
 ENTRYPOINT ["python", "src/api/main.py"]
