@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 from api.db.functions.all import update_user_last_verify_request
 from api.emails import EmailSender
@@ -11,13 +11,15 @@ from fastapi_users.db import BaseUserDatabase
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[FastApiUser, int]):
-    email = EmailSender()
-    secret = get_secret("USER_SECRET")
-    if secret is None:
-        raise RuntimeError("USER_SECRET secret not defined")
+    def __init__(self, *args: Any, **kwargs: Any):
+        super(UserManager, self).__init__(*args, **kwargs)
+        self.email = EmailSender()
+        self.secret = get_secret("USER_SECRET")
+        if self.secret is None:
+            raise RuntimeError("USER_SECRET secret not defined")
 
-    reset_password_token_secret = secret
-    verification_token_secret = secret
+        self.reset_password_token_secret = self.secret
+        self.verification_token_secret = self.secret
 
     async def on_after_register(
         self, user: FastApiUser, request: Optional[Request] = None
