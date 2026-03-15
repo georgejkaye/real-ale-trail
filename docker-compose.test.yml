@@ -1,0 +1,95 @@
+networks:
+  internal:
+    external: false
+
+services:
+  init:
+    build:
+      context: db
+      dockerfile: Dockerfile
+    volumes:
+      - ./db:/db
+  db:
+    image: postgres
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    environment:
+      POSTGRES_USER: realaletrail
+      POSTGRES_DB: realaletrail
+      POSTGRES_PASSWORD: realaletrail
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./db/.populate/:/docker-entrypoint-initdb.d/
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 1s
+      timeout: 1s
+      retries: 500
+      start_period: 0s
+  api:
+    depends_on:
+      db:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: api/Dockerfile.prod
+      args:
+        POETRY_VERSION: 2.3.2
+        ENV: test
+    ports:
+      - ${API_PORT:-8000}:${API_PORT:-8000}
+    environment:
+      API_ENV: prod
+      API_PORT: ${API_PORT:-8000}
+      CLIENT_HOST: client
+      CLIENT_PROTOCOL: ${CLIENT_PROTOCOL:-https}
+      DB_HOST: db
+      DB_NAME: realaletrail
+      DB_USER: realaletrail
+      DB_PASSWORD: /app/db.secret
+      FROM_EMAIL: realaletrail@realaletrail.com
+      SMTP_SERVER: smtp.realaletrail.com
+      SMTP_PORT: 587
+      SMTP_USER: realaletrail@realaletrail.com
+      SMTP_PASSWORD: /app/smtp_secret
+      USER_SECRET: /app/user_secret
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:$$API_PORT/ || exit 1"]
+      interval: 10s
+      timeout: 1s
+      retries: 100
+      start_period: 0s
+  client:
+    depends_on:
+      api:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: client/Dockerfile.prod
+      args:
+        CLIENT_PORT: ${CLIENT_PORT:-3000}
+        API_PROTOCOL: ${API_PROTOCOL:-https}
+        API_HOST: api
+        POETRY_VERSION: 2.3.2
+    environment:
+      CLIENT_PORT: ${CLIENT_PORT:-3000}
+    ports:
+      - ${CLIENT_PORT:-3000}:${CLIENT_PORT:-3000}
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:$$CLIENT_PORT/ || exit 1"]
+      interval: 10s
+      timeout: 1s
+      retries: 100
+      start_period: 0s
+
+volumes:
+  pgdata:

@@ -5,9 +5,9 @@ DB_POPULATE_DIR=/db/.populate
 if [ ! -d $DB_POPULATE_DIR ]
 then
     mkdir $DB_POPULATE_DIR
+else
+    rm $DB_POPULATE_DIR/*
 fi
-
-rm $DB_POPULATE_DIR/*
 
 DB_SCHEMA_DIR="/db/schema"
 

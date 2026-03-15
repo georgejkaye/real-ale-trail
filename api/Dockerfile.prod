@@ -1,4 +1,11 @@
-# Build image
+FROM georgejkaye/postgres-codegen:latest AS codegen
+
+WORKDIR /app
+
+COPY db/code code
+
+RUN poetry run python src/postgrescodegen/main.py code output api.db
+
 FROM python:3.14-bookworm AS builder
 
 ARG POETRY_VERSION
@@ -12,12 +19,16 @@ RUN pip install poetry==${POETRY_VERSION}
 
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock ./
+COPY api/pyproject.toml api/poetry.lock ./
+COPY api/src src
+COPY --from=codegen /app/output/db src/api/db
+
 # Poetry complains without a readme
 RUN touch README.md
 
 RUN poetry install --without dev --no-root && rm -rf ${POETRY_CACHE_DIR}
 
+# Generate db code
 # Runtime image
 FROM python:3.14-slim-bookworm AS runtime
 
@@ -33,8 +44,17 @@ COPY --from=builder /app/pyproject.toml ./app/pyproject.toml
 
 ENV PYTHONPATH='/app/src:$PYTHONPATH'
 
-COPY src ./app/src
-
 WORKDIR /app
+
+COPY api/src src
+COPY --from=codegen /app/output/db src/api/db
+
+ARG ENV
+
+RUN if [ "$ENV" = "test" ]; then \
+    echo "realaletrail" > /app/db.secret; \
+    echo "user" > /app/user.secret; \
+    echo "smtp" > /app/smtp.secret; \
+    fi
 
 ENTRYPOINT ["python", "src/api/main.py"]

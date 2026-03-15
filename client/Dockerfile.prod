@@ -9,14 +9,53 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies
-COPY package.json yarn.lock ./
+COPY client/package.json client/yarn.lock ./
 RUN yarn --frozen-lockfile
+
+FROM georgejkaye/postgres-codegen:latest AS codegen
+
+WORKDIR /app
+
+COPY db/code code
+
+RUN poetry run python src/postgrescodegen/main.py code output api.db
+
+FROM python:3.14-bookworm AS openapi-py
+
+ARG POETRY_VERSION
+
+RUN pip install poetry==${POETRY_VERSION}
+
+WORKDIR /app
+
+COPY api/pyproject.toml api/poetry.lock ./
+# Poetry complains without a readme
+RUN touch README.md
+
+COPY api/src /app/src
+RUN poetry install
+
+COPY --from=codegen /app/output/db /app/src/api/db
+
+RUN poetry run python src/api/genapi.py /app/openapi.json
+
+FROM base AS openapi-ts
+
+WORKDIR /app
+
+COPY --from=openapi-py /app/openapi.json /app/openapi.json
+
+RUN npm i -D openapi-typescript
+RUN npx openapi-typescript /app/openapi.json -o /app/api.d.ts
 
 # Rebuild source only when needed
 FROM base AS builder
+
 WORKDIR /app
+
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY client/ .
+COPY --from=openapi-ts /app/api.d.ts ./src/app/api/api.d.ts
 
 ARG API_HOST
 ENV API_HOST=${API_HOST}
@@ -27,6 +66,8 @@ ENV API_PROTOCOL=${API_PROTOCOL}
 RUN yarn build
 
 FROM base AS runner
+
+RUN apk add curl
 
 WORKDIR /app
 

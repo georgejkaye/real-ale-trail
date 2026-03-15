@@ -5,6 +5,9 @@ networks:
     external: false
 services:
   data:
+    depends_on:
+      codegen:
+        condition: service_completed_successfully
     build:
       context: api
       dockerfile: Dockerfile.data
@@ -17,23 +20,8 @@ services:
       DB_PASSWORD_FILE: /run/secrets/db_secret
     networks:
       - internal
-  codegen:
-    build:
-      context: codegen
-      dockerfile: Dockerfile
-    environment:
-      OUTPUT_MODULE_NAME: api.db
-      WATCH_FILES: 0
-      ROLL_SCRIPTS: 1
-      DB_HOST: ${DB_HOST}
-      DB_USER: ${DB_USER}
-      DB_NAME: ${DB_NAME}
-      DB_PASSWORD_FILE: /run/secrets/db_secret
-    volumes:
-      - ./db/code:/app/input
-      - ./api/src/api:/app/output
-    networks:
-      - internal
+    secrets:
+      - db_secret
   api:
     depends_on:
       data:
@@ -41,8 +29,8 @@ services:
       codegen:
         condition: service_completed_successfully
     build:
-      context: api
-      dockerfile: Dockerfile.prod
+      context: .
+      dockerfile: api/Dockerfile.prod
       args:
         POETRY_VERSION: 2.3.2
     ports:
@@ -62,8 +50,6 @@ services:
       SMTP_USER: ${SMTP_USER}
       SMTP_PASSWORD: /run/secrets/smtp_secret
       USER_SECRET: /run/secrets/user_secret
-    volumes:
-      - ./api/src:/app/src
     secrets:
       - db_secret
       - user_secret
@@ -83,37 +69,33 @@ services:
       - "traefik.http.routers.realaletrail_api.tls=true"
       - "traefik.http.routers.realaletrail_api.tls.certresolver=lets-encrypt"
       - "traefik.http.services.realaletrail_api.loadbalancer.server.port=${API_PORT:-8000}"
-  openapi:
-    depends_on:
-      api:
-        condition: service_healthy
-    build:
-      context: openapi
-      dockerfile: Dockerfile.prod
-    environment:
-      OPENAPI_JSON_PATH: /app/input/openapi.json
-      OPENAPI_TS_PATH: /app/output/api.d.ts
-    volumes:
-      - ./api/openapi:/app/input
-      - ./client/src/app/api:/app/output
   client:
     depends_on:
       api:
         condition: service_healthy
-      openapi:
+      codegen:
         condition: service_completed_successfully
     build:
-      context: client
-      dockerfile: Dockerfile.prod
+      context: .
+      dockerfile: client/Dockerfile.prod
       args:
         CLIENT_PORT: ${CLIENT_PORT:-3000}
         API_PROTOCOL: ${API_PROTOCOL:-https}
         API_HOST: ${API_HOST}
+        POETRY_VERSION: 2.3.2
+    environment:
+      CLIENT_PORT: ${CLIENT_PORT:-3000}
     ports:
       - ${CLIENT_PORT:-3000}:${CLIENT_PORT:-3000}
     networks:
       - internal
       - web
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:$$CLIENT_PORT/ || exit 1"]
+      interval: 10s
+      timeout: 1s
+      retries: 100
+      start_period: 0s
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.realaletrail_client.rule=Host(`${CLIENT_HOST}`)"
