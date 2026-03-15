@@ -9,6 +9,7 @@ DROP TYPE IF EXISTS single_user_visit_data CASCADE;
 DROP TYPE IF EXISTS user_follow_data CASCADE;
 DROP TYPE IF EXISTS user_high_level_summary_data CASCADE;
 DROP TYPE IF EXISTS insert_visit_result CASCADE;
+DROP TYPE IF EXISTS visit_data CASCADE;
 
 CREATE TYPE user_data AS (
     user_id INTEGER_NOTNULL,
@@ -85,4 +86,15 @@ CREATE TYPE user_count_data AS (
 
 CREATE TYPE insert_visit_result AS (
     visit_id INTEGER_NOTNULL
+);
+
+CREATE TYPE visit_data AS (
+    visit_id INTEGER_NOTNULL,
+    user_id INTEGER_NOTNULL,
+    venue_id INTEGER_NOTNULL,
+    venue_name TEXT_NOTNULL,
+    visit_date TIMESTAMP_NOTNULL,
+    notes TEXT,
+    rating INTEGER,
+    drink TEXT
 );

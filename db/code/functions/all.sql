@@ -2,11 +2,13 @@ DROP FUNCTION IF EXISTS insert_user;
 DROP FUNCTION IF EXISTS insert_venue;
 DROP FUNCTION IF EXISTS insert_venues;
 DROP FUNCTION IF EXISTS insert_visit;
+DROP FUNCTION IF EXISTS update_visit;
 DROP FUNCTION IF EXISTS select_user_by_user_id;
 DROP FUNCTION IF EXISTS select_user_by_email;
 DROP FUNCTION IF EXISTS select_venues;
 DROP FUNCTION IF EXISTS select_venues_by_user;
 DROP FUNCTION IF EXISTS select_visits;
+DROP FUNCTION IF EXISTS select_visit;
 DROP FUNCTION IF EXISTS select_user_summary;
 DROP FUNCTION IF EXISTS select_user_counts;
 DROP FUNCTION IF EXISTS update_user;
@@ -131,6 +133,26 @@ VALUES (
     p_drink
 )
 RETURNING visit_id AS new_visit_id;
+$$;
+
+CREATE OR REPLACE FUNCTION update_visit (
+    p_user_id INTEGER,
+    p_visit_id INTEGER,
+    p_notes TEXT,
+    p_rating INTEGER,
+    p_drink TEXT
+)
+RETURNS VOID
+LANGUAGE sql
+AS
+$$
+UPDATE visit
+SET
+    notes = p_notes,
+    rating = p_rating,
+    drink = p_drink
+WHERE visit_id = p_visit_id
+AND user_id = p_user_id;
 $$;
 
 CREATE OR REPLACE FUNCTION select_user_by_user_id (
@@ -341,6 +363,28 @@ INNER JOIN venue
 ON visit.venue_id = venue.venue_id
 INNER JOIN app_user
 ON visit.user_id = app_user.user_id;
+$$;
+
+CREATE OR REPLACE FUNCTION select_visit (
+    p_visit_id INTEGER_NOTNULL
+)
+RETURNS SETOF visit_data
+LANGUAGE sql
+AS
+$$
+SELECT
+    visit.visit_id,
+    visit.user_id,
+    venue.venue_id,
+    venue.venue_name,
+    visit.visit_date,
+    visit.notes,
+    visit.rating,
+    visit.drink
+FROM visit
+INNER JOIN venue
+ON visit.venue_id = venue.venue_id
+WHERE visit.visit_id = p_visit_id;
 $$;
 
 CREATE OR REPLACE FUNCTION select_user_summary (
