@@ -40,7 +40,7 @@ services:
       dockerfile: api/Dockerfile.prod
       args:
         POETRY_VERSION: 2.3.2
-        ENV: build
+        ENV: test
     ports:
       - ${API_PORT:-8000}:${API_PORT:-8000}
     environment:

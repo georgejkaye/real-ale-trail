@@ -1,4 +1,4 @@
-name: Deploy
+name: PR build check
 on:
   pull_request:
 
@@ -9,16 +9,7 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v6
-      - name: Create db secret
-        run: echo "realaletrail" > db.secret
-      - name: Create user secret
-        run: echo "user" > user.secret
-      - name: Create smtp secret
-        run: echo "smtp" > smtp.secret
       - name: Build docker containers
-        run: docker compose -f docker-compose.build.yml up --build --wait
-      - name: Print logs on errro
-        if: error()
-        run: docker compose -docker-compose.build.yml logs
+        run: docker compose -f docker-compose.test.yml up --build --wait
       - name: Down docker containers
         run: docker compose down
