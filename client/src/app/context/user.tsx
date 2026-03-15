@@ -15,11 +15,10 @@ import { ClientContext } from "../api/ReactQueryClientProvider"
 export const UserContext = createContext({
   token: undefined as string | undefined,
   user: undefined as User | undefined,
-  isRetrievingFromStorage: false,
   setToken: (() => undefined) as Dispatch<SetStateAction<string | undefined>>,
   logOut: () => {},
   fetchUser: () => {},
-  isLoadingUser: false,
+  isLoadingUser: true,
 })
 
 export const UserProvider = ({ children }: PropsWithChildren) => {
@@ -61,8 +60,7 @@ export const UserProvider = ({ children }: PropsWithChildren) => {
         user: token ? data : undefined,
         fetchUser,
         setToken,
-        isLoadingUser: isLoading || isRefetching,
-        isRetrievingFromStorage,
+        isLoadingUser: isLoading || isRefetching || isRetrievingFromStorage,
         logOut: () => setToken(undefined),
       }}
     >

@@ -5,8 +5,7 @@ import { UserContext } from "./context/user"
 
 const TopBar = () => {
   const linkStyle = "hover:underline cursor-pointer"
-  const { user, isLoadingUser, isRetrievingFromStorage, setToken } =
-    useContext(UserContext)
+  const { user, isLoadingUser, setToken } = useContext(UserContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
   const onClickLogout = () => {
     setToken(undefined)
@@ -24,7 +23,7 @@ const TopBar = () => {
             Real Ale Trail tracker
           </Link>
         </div>
-        {!isLoadingUser && !isRetrievingFromStorage && (
+        {!isLoadingUser && (
           <>
             <div className="hidden md:flex flex-row gap-4">
               <Link className={linkStyle} onClick={onClickLink} href="/">
