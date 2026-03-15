@@ -16,9 +16,9 @@ FROM georgejkaye/postgres-codegen:latest AS codegen
 
 WORKDIR /app
 
-COPY db/code code/
+COPY db/code code
 
-RUN poetry run python src/postgrescodegen/main.py /app/code /app/output api.db
+RUN poetry run python src/postgrescodegen/main.py code output api.db
 
 FROM python:3.14-bookworm AS openapi-py
 
@@ -35,7 +35,7 @@ RUN touch README.md
 COPY api/src /app/src
 RUN poetry install
 
-COPY --from=codegen /app/output /app/src/api/db
+COPY --from=codegen /app/output/db /app/src/api/db
 
 RUN poetry run python src/api/genapi.py /app/openapi.json
 
