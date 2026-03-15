@@ -16,7 +16,7 @@ const VisitStatsPane = ({
   totalVenueCount,
 }: VisitStatsPaneProps) => {
   return (
-    <div className="absolute">
+    <div className="absolute top-0 right-0 m-2 p-2 rounded-lg bg-white border-3 border-gray-200">
       <span className="text-lg font-bold">
         {currentVenueCount}/{totalVenueCount}
       </span>{" "}
@@ -48,7 +48,7 @@ export default function Home() {
   return isLoadingVenues ? (
     <Loader />
   ) : (
-    <div className="flex-grow">
+    <div className="flex-grow relative">
       <VenueMap
         user={user}
         venues={venues ?? []}
