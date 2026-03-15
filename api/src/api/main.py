@@ -11,8 +11,10 @@ from api.db.functions.all import (
     select_user_summary_fetchone,
     select_venue_by_venue_id_fetchone,
     select_venues_fetchall,
+    select_visit_fetchone,
     select_visits_fetchall,
     update_user_display_name,
+    update_visit,
 )
 from api.db.types.all import (
     SingleUserVisitData,
@@ -20,6 +22,7 @@ from api.db.types.all import (
     UserSummaryData,
     UserVisitData,
     VenueData,
+    VisitData,
 )
 from api.lifespan import get_db_connection, lifespan
 from api.users.auth import auth_backend
@@ -89,6 +92,19 @@ async def get_visits() -> list[UserVisitData]:
     return select_visits_fetchall(get_db_connection())
 
 
+@app.get(
+    "/visit/{visit_id}",
+    summary="Get a particular visit",
+    tags=["visit"],
+    responses={404: {"model": NotFoundResponse}},
+)
+async def get_visit(visit_id: int) -> VisitData:
+    visit = select_visit_fetchone(get_db_connection(), visit_id)
+    if visit is None:
+        raise HTTPException(status_code=404)
+    return visit
+
+
 @app.post("/visit", summary="Log a visit", tags=["visit"])
 async def post_visit(
     venue_id: int,
@@ -101,6 +117,17 @@ async def post_visit(
     insert_visit_fetchone(
         get_db_connection(), user.id, venue_id, visit_date, notes, rating, drink
     )
+
+
+@app.patch("/visit/{visit_id}", summary="Update details about a visit", tags=["visit"])
+async def patch_visit(
+    visit_id: int,
+    notes: str,
+    rating: int,
+    drink: str,
+    user: FastApiUser = Depends(current_user),
+) -> None:
+    update_visit(get_db_connection(), user.id, visit_id, notes, rating, drink)
 
 
 app.include_router(
