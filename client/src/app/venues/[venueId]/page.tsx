@@ -115,6 +115,7 @@ interface VenueVisitProps {
 }
 
 const VenueVisitCard = ({ visit }: VenueVisitProps) => {
+  const { user } = useContext(UserContext)
   const visitDate = visit.visit_date
     ? new Date(Date.parse(visit.visit_date))
     : undefined
@@ -146,6 +147,14 @@ const VenueVisitCard = ({ visit }: VenueVisitProps) => {
         value={visit.rating ?? 0}
         readOnly={true}
       />
+      {user && user.user_id === visit.user_id && (
+        <Link
+          href={`/users/${user?.user_id}/visits/${visit.visit_id}/edit`}
+          className="font-bold hover:underline"
+        >
+          Edit
+        </Link>
+      )}
     </div>
   )
 }
@@ -158,7 +167,7 @@ const Page = () => {
     router.push(`/venues/${venue?.venue_id}/visit`)
   }
   return (
-    <div className="flex flex-col md:w-1/3 p-4 md:mx-auto">
+    <div className="flex flex-col md:w-2/3 lg:w-1/2 p-4 md:mx-auto">
       {false ? (
         <Loader />
       ) : isError ? (
