@@ -54,10 +54,6 @@ export const UserProvider = ({ children }: PropsWithChildren) => {
     setRetrievingFromStorage(false)
   }, [])
 
-  useEffect(() => {
-    setToken("")
-  }, [error])
-
   return (
     <UserContext.Provider
       value={{
