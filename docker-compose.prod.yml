@@ -4,7 +4,24 @@ networks:
   internal:
     external: false
 services:
+  db:
+    image: georgejkaye/postgres-codegen
+    environment:
+      WATCH_FILES: 0
+      ROLL_SCRIPTS: 1
+      OUTPUT_MODULE_NAME: api.db
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_NAME: ${DB_NAME}
+      DB_PASSWORD_FILE: /run/secrets/db_secret
+    volumes:
+      - ./db/code:/app/input
+    secrets:
+      - db_secret
   data:
+    depends_on:
+      db:
+        condition: service_completed_successfully
     build:
       context: api
       dockerfile: Dockerfile.data
