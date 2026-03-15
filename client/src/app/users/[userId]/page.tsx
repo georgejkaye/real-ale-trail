@@ -62,9 +62,15 @@ const Page = () => {
             {userSummary.visits.length === 1 ? "venue" : "venues"} visited
           </div>
           <div className="flex flex-col gap-4">
-            {userSummary.visits.map((visit) => (
-              <UserSummaryVisitCard key={visit.visit_id} visit={visit} />
-            ))}
+            {userSummary.visits
+              .sort((a, b) =>
+                a.visit_date == null || b.visit_date == null
+                  ? 0
+                  : Date.parse(b.visit_date) - Date.parse(a.visit_date),
+              )
+              .map((visit) => (
+                <UserSummaryVisitCard key={visit.visit_id} visit={visit} />
+              ))}
           </div>
         </div>
       )}
