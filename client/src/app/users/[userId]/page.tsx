@@ -6,15 +6,19 @@ import Link from "next/link"
 import { useContext } from "react"
 import { SingleUserVisit } from "@/app/api/client"
 import { notFound } from "next/navigation"
+import { UserContext } from "@/app/context/user"
 
 interface UserSummaryVisitCardProps {
   visit: SingleUserVisit
 }
 
 const UserSummaryVisitCard = ({ visit }: UserSummaryVisitCardProps) => {
-  const visitDate = visit.visit_date
-    ? new Date(Date.parse(visit.visit_date))
-    : undefined
+  const { user } = useContext(UserContext)
+  const { userSummary } = useContext(UserSummaryContext)
+
+  const visitDate = new Date(Date.parse(visit.visit_date))
+  const isCurrentUser = user?.user_id == userSummary?.user_id
+
   return (
     <div className="rounded-xl bg-accenthover text-accentfg p-4 flex flex-col gap-2">
       <Link
@@ -41,6 +45,14 @@ const UserSummaryVisitCard = ({ visit }: UserSummaryVisitCardProps) => {
         <div>&apos;{visit.notes}&apos;</div>
       )}
       <Rating style={{ maxWidth: 100 }} value={visit.rating ?? 0} readOnly />
+      {isCurrentUser && (
+        <Link
+          href={`/users/${user?.user_id}/visits/${visit.visit_id}/edit`}
+          className="font-bold hover:underline"
+        >
+          Edit
+        </Link>
+      )}
     </div>
   )
 }

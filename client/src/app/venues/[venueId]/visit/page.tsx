@@ -1,63 +1,22 @@
 "use client"
 
-import { useContext, useEffect, useState } from "react"
+import { useContext, useState } from "react"
 import { UserContext } from "@/app/context/user"
-import { useRouter } from "next/navigation"
+import { notFound, unauthorized, useRouter } from "next/navigation"
 import { VenueContext } from "@/app/context/venue"
-import { Rating } from "@smastrom/react-rating"
-
-import { SubmitButton, TextAreaInput, TextInput } from "@/app/components/forms"
 import { Loader } from "@/app/components/Loader"
 import { ClientContext } from "@/app/api/ReactQueryClientProvider"
-
-interface RecordVisitFormProps {
-  submitVisit: (notes: string, rating: number, drink: string) => Promise<void>
-}
-
-const RecordVisitForm = ({ submitVisit }: RecordVisitFormProps) => {
-  const [notesText, setNotesText] = useState("")
-  const [ratingValue, setRatingValue] = useState(0)
-  const [drinkText, setDrinkText] = useState("")
-  const performSubmitVisit = () => {
-    submitVisit(notesText, ratingValue, drinkText)
-  }
-  return (
-    <form action={performSubmitVisit} className="flex flex-col gap-4">
-      <div>
-        <div>Notes</div>
-        <TextAreaInput
-          value={notesText}
-          setValue={setNotesText}
-          maxLength={250}
-        />
-      </div>
-      <div>
-        <div>Rating</div>
-        <Rating
-          style={{ maxWidth: 250 }}
-          value={ratingValue}
-          onChange={setRatingValue}
-        />
-      </div>
-      <div>
-        <div>Drink</div>
-        <TextInput
-          value={drinkText}
-          setValue={setDrinkText}
-          type="text"
-          maxLength={50}
-        />
-      </div>
-      <SubmitButton label="Submit" />
-    </form>
-  )
-}
+import RecordVisitForm from "@/app/components/RecordVisitForm"
 
 const Page = () => {
   const { client } = useContext(ClientContext)
   const { token, user, isLoadingUser } = useContext(UserContext)
   const { venue, isLoadingVenue } = useContext(VenueContext)
   const router = useRouter()
+
+  const [notesText, setNotesText] = useState("")
+  const [ratingValue, setRatingValue] = useState(0)
+  const [drinkText, setDrinkText] = useState("")
   const [errorText, setErrorText] = useState("")
 
   const { mutate: postVisit, isPending: isPendingPostVisit } =
@@ -71,39 +30,29 @@ const Page = () => {
       },
     })
 
-  useEffect(() => {
-    if (!isLoadingUser && !user) {
-      router.push("/")
-    }
-  }, [isLoadingUser, router, user])
-
-  useEffect(() => {
-    if (!isLoadingVenue && !venue) {
-      router.push("/")
-    }
-  }, [isLoadingVenue, router, venue])
-
-  const submitVisit = async (notes: string, rating: number, drink: string) => {
+  const submitVisit = async () => {
     if (venue && venue.venue_id) {
       const params = {
         query: {
           venue_id: venue.venue_id,
           visit_date: new Date(Date.now()).toISOString(),
-          notes,
-          rating,
-          drink,
+          notes: notesText,
+          rating: ratingValue,
+          drink: drinkText,
         },
       }
       postVisit({ params, headers: { Authorization: `Bearer ${token}` } })
     }
   }
 
-  return !user || !venue ? (
-    ""
-  ) : (
-    <div className="flex flex-col md:w-1/2 lg:w-1/3 md:mx-auto items-center p-4">
-      {isPendingPostVisit ? (
+  return (
+    <div className="flex flex-col md:w-2/3 lg:w-1/3 md:mx-auto items-center p-4">
+      {isPendingPostVisit || isLoadingUser || isLoadingVenue ? (
         <Loader />
+      ) : !user ? (
+        unauthorized()
+      ) : !venue ? (
+        notFound()
       ) : (
         <div className="w-full flex flex-col gap-4">
           <h1 className="text-2xl font-bold">Record a visit</h1>
@@ -111,7 +60,15 @@ const Page = () => {
             <div className="bg-red-300 rounded p-4">{errorText}</div>
           )}
           <div className="text-xl">{venue.venue_name}</div>
-          <RecordVisitForm submitVisit={submitVisit} />
+          <RecordVisitForm
+            notesText={notesText}
+            setNotesText={setNotesText}
+            ratingValue={ratingValue}
+            setRatingValue={setRatingValue}
+            drinkText={drinkText}
+            setDrinkText={setDrinkText}
+            performSubmit={submitVisit}
+          />
         </div>
       )}
     </div>

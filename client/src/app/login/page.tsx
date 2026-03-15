@@ -1,5 +1,5 @@
 "use client"
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Loader } from "../components/Loader"
 import { UserContext } from "../context/user"
 import Link from "next/link"
@@ -51,20 +51,22 @@ const LoginBox = ({ performLogin }: LoginBoxProps) => {
 }
 
 const Page = () => {
-  const { setToken } = useContext(UserContext)
+  const { user, isLoadingUser, setToken } = useContext(UserContext)
   const { client } = useContext(ClientContext)
   const router = useRouter()
-  const [isLoginSuccessful, setLoginSuccessful] = useState(false)
   const [errorString, setErrorString] = useState("")
+  const [successString, setSuccessString] = useState("")
+  const [freshLogin, setFreshLogin] = useState(false)
 
-  const { mutate: postLogin, isPending } = client.useMutation(
-    "post",
-    "/auth/jwt/login",
-    {
+  const { mutate: postLogin, isPending: isPendingPostLogin } =
+    client.useMutation("post", "/auth/jwt/login", {
       onSuccess: (response) => {
         setToken(response.access_token)
         setErrorString("")
-        setLoginSuccessful(true)
+        setFreshLogin(true)
+        setSuccessString(
+          "Login successful, redirecting you to the home page...",
+        )
         setTimeout(() => router.push("/"), 1000)
       },
       onError: (error) => {
@@ -74,8 +76,14 @@ const Page = () => {
           setErrorString(`Could not log in: ${error.detail}`)
         }
       },
-    },
-  )
+    })
+
+  useEffect(() => {
+    if (user && !freshLogin) {
+      setSuccessString("Already logged in, redirecting you to the home page...")
+      setTimeout(() => router.push("/"), 1000)
+    }
+  }, [user])
 
   const performLogin = async (email: string, password: string) => {
     const body = {
@@ -93,12 +101,12 @@ const Page = () => {
   }
   return (
     <div className="flex flex-col md:w-1/2 lg:w-1/3 md:mx-auto p-4 items-center">
-      {isPending ? (
+      {(successString == "" && user) || isLoadingUser || isPendingPostLogin ? (
         <Loader />
-      ) : isLoginSuccessful ? (
+      ) : successString !== "" ? (
         <>
           <div className="w-full p-4 bg-accent text-accentfg rounded">
-            Login successful, redirecting you to the home page...
+            {successString}
           </div>
           <Loader />
         </>
