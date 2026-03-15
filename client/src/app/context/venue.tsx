@@ -19,9 +19,16 @@ export const VenueProvider = ({
     data: venue,
     isLoading: isLoadingVenue,
     isError,
-  } = client.useQuery("get", "/venues/{venue_id}", {
-    params: { path: { venue_id: venueId } },
-  })
+  } = client.useQuery(
+    "get",
+    "/venues/{venue_id}",
+    {
+      params: { path: { venue_id: venueId } },
+    },
+    {
+      retry: (failureCount, error) => error.detail !== "Not Found",
+    },
+  )
   return (
     <VenueContext.Provider value={{ venue, isLoadingVenue, isError }}>
       {children}
