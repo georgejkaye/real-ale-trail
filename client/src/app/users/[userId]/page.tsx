@@ -103,7 +103,7 @@ const UserSummaryVisitCard = ({ visit }: UserSummaryVisitCardProps) => {
   const isCurrentUser = user?.user_id == userSummary?.user_id
 
   return (
-    <div className="rounded-xl bg-accenthover text-accentfg p-4 flex flex-col gap-2">
+    <div className="rounded-xl bg-accentlight text-accentfg p-4 flex flex-col gap-2">
       <Link
         href={`/venues/${visit.venue_id}`}
         className="font-bold text-xl hover:underline"

@@ -77,7 +77,7 @@ export const TextAreaInput = ({
 }
 
 const buttonStyle =
-  "font-bold text-white p-2 rounded bg-accent cursor-pointer hover:bg-accenthover disabled:bg-accentdisabled disabled:cursor-not-allowed"
+  "font-bold text-white p-2 rounded bg-accent cursor-pointer hover:bg-accentlight disabled:bg-accentdisabled disabled:cursor-not-allowed"
 
 interface SubmitButtonProps {
   label: string

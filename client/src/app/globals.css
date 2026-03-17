@@ -4,6 +4,7 @@
     --color-accent: #282e54;
     --color-back: #f9eed2;
     --color-accentfg: #f9eed2;
-    --color-accenthover: #404880;
+    --color-accentlight: #404880;
+    --color-accentlighter: #626cb3;
     --color-accentdisabled: #8d93b8;
 }
