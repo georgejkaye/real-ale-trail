@@ -45,7 +45,7 @@ const Page = () => {
   return isLoadingUsers || !users ? (
     <Loader />
   ) : (
-    <div className="md:w-2/3 lg:w-1/3 p-4 flex flex-col gap-4 mx-auto">
+    <div className="w-full md:w-2/3 lg:w-1/2 p-4 flex flex-col gap-4 mx-auto">
       <h2 className="text-2xl font-bold">Users</h2>
       {users
         .sort((a, b) => b.unique_visit_count - a.unique_visit_count)
