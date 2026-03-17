@@ -36,6 +36,9 @@ const TopBar = () => {
               >
                 Venues
               </Link>
+              <Link className={linkStyle} onClick={onClickLink} href="/users">
+                Users
+              </Link>
               {user ? (
                 <>
                   <div className={linkStyle} onClick={onClickLogout}>
@@ -71,6 +74,9 @@ const TopBar = () => {
           </Link>
           <Link className={linkStyle} onClick={onClickLink} href="/venues/list">
             Venues
+          </Link>
+          <Link className={linkStyle} onClick={onClickLink} href="/users">
+            Users
           </Link>
           {user ? (
             <>

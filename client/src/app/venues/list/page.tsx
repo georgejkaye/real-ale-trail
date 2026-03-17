@@ -32,7 +32,7 @@ const VenueCard = ({ venue, location }: VenueCardProps) => {
         <div className="flex flex-col flex-1 gap-2">
           <div className="text-2xl font-bold">{venue.venue_name}</div>
           <div>{venue.venue_address}</div>
-          {distanceToVenue && <div>{distanceToVenue}km away</div>}
+          {distanceToVenue && <div>{distanceToVenue.toFixed(2)}km away</div>}
           <div>{visitCount} visits</div>
           <Rating
             style={{ maxWidth: 100 }}
@@ -74,7 +74,7 @@ const Page = () => {
       } else {
         const aDistance = getDistanceToVenue(a, location)
         const bDistance = getDistanceToVenue(b, location)
-        return aDistance && bDistance ? bDistance - aDistance : 0
+        return aDistance && bDistance ? aDistance - bDistance : 0
       }
     },
     [location],
@@ -86,7 +86,7 @@ const Page = () => {
       } else {
         const aDistance = getDistanceToVenue(a, location)
         const bDistance = getDistanceToVenue(b, location)
-        return aDistance && bDistance ? aDistance - bDistance : 0
+        return aDistance && bDistance ? bDistance - aDistance : 0
       }
     },
     [location],
@@ -151,7 +151,7 @@ const Page = () => {
       <input
         type="text"
         placeholder="Type to filter..."
-        className="p-4 rounded-xl border-gray-400 border-1"
+        className="p-4 rounded-xl border-gray-400 border-1 bg-white"
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
       />

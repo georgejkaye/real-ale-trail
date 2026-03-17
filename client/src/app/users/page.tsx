@@ -6,45 +6,14 @@ import { Loader } from "../components/Loader"
 import { UserCount } from "../api/client"
 import { FaStar } from "react-icons/fa"
 
-interface UserVisitsProps {
-  userId: number
-}
-
-const UserVisits = ({ userId }: UserVisitsProps) => {
-  const { client } = useContext(ClientContext)
-  const { data: user, isLoading } = client.useQuery("get", "/users/{user_id}", {
-    params: {
-      path: {
-        user_id: userId,
-      },
-    },
-  })
-  return isLoading || !user ? (
-    <Loader />
-  ) : (
-    <div>
-      {user.visits.map((visit) => (
-        <div>{visit.visit_id}</div>
-      ))}
-    </div>
-  )
-}
-
 interface UserCardProps {
   user: UserCount
 }
 
 const UserCard = ({ user }: UserCardProps) => {
-  const [isExpanded, setExpanded] = useState(false)
-  const onClickCard = () => {
-    setExpanded((old) => !old)
-  }
   return (
     <div className="flex flex-col gap-4">
-      <div
-        className="bg-accentlight p-4 rounded-xl text-accentfg flex flex-col md:flex-col gap-4"
-        onClick={onClickCard}
-      >
+      <div className="bg-accent p-4 rounded-xl text-accentfg flex flex-col md:flex-col gap-4">
         <div className="flex flex-row items-center flex-1">
           <div className="text-xl font-bold flex-1">{user.display_name}</div>
           <div className="flex flex-row gap-2 items-center">
