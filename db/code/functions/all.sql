@@ -396,7 +396,6 @@ AS
 $$
 SELECT
     app_user.user_id,
-    app_user.email,
     app_user.display_name,
     COALESCE(visit_table.visits, ARRAY[]::single_user_visit_data[])
 FROM app_user
@@ -431,9 +430,10 @@ SELECT
     app_user.user_id,
     app_user.display_name,
     COALESCE(visit_count_table.visit_count, 0),
-    COALESCE(visit_count_table.unique_visit_count, 0)
+    COALESCE(visit_count_table.unique_visit_count, 0),
+    user_favourite.venue_name
 FROM app_user
-lEFT JOIN (
+LEFT JOIN (
     SELECT
         visit.user_id,
         COUNT(visit.*) AS visit_count,
@@ -441,7 +441,33 @@ lEFT JOIN (
     FROM visit
     GROUP BY user_id
 ) visit_count_table
-ON app_user.user_id = visit_count_table.user_id;
+ON app_user.user_id = visit_count_table.user_id
+LEFT JOIN (
+    SELECT
+        user_favourite_id.user_id,
+        venue.venue_name
+    FROM (
+        SELECT
+            DISTINCT ON(visit.user_id)
+            visit.user_id,
+            venue_id
+        FROM visit
+        INNER JOIN (
+            SELECT
+                user_id,
+                MAX(rating) AS rating
+            FROM visit
+            GROUP BY user_id
+        ) user_max_rating
+        ON visit.user_id = user_max_rating.user_id
+        AND visit.rating = user_max_rating.rating
+        ORDER BY visit.user_id, visit_date
+    ) user_favourite_id
+    INNER JOIN venue
+    ON user_favourite_id.venue_id = venue.venue_id
+) user_favourite
+ON app_user.user_id = user_favourite.user_id
+ORDER BY app_user.user_id;
 $$;
 
 CREATE OR REPLACE FUNCTION update_user (

@@ -72,7 +72,6 @@ CREATE TYPE single_user_visit_data AS (
 
 CREATE TYPE user_summary_data AS (
     user_id INTEGER_NOTNULL,
-    email TEXT_NOTNULL,
     display_name TEXT_NOTNULL,
     visits single_user_visit_data[]
 );
@@ -81,7 +80,8 @@ CREATE TYPE user_count_data AS (
     user_id INTEGER_NOTNULL,
     display_name TEXT_NOTNULL,
     visit_count INTEGER_NOTNULL,
-    unique_visit_count INTEGER_NOTNULL
+    unique_visit_count INTEGER_NOTNULL,
+    favourite_venue TEXT_NOTNULL
 );
 
 CREATE TYPE insert_visit_result AS (
