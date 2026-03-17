@@ -18,3 +18,6 @@ jobs:
         run: docker compose -f docker-compose-test.yml logs
       - name: Down docker containers
         run: docker compose -f docker-compose.test.yml down
+      - name: Fail if error
+        if: ${{ failure() && steps.up.conclusion == 'failure' }}
+        run: exit 1
