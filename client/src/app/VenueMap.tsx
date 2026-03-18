@@ -293,7 +293,7 @@ export const VenueMap = ({
             featureCollection={venueFeatureCollection}
             currentVenue={currentVenue}
             setCurrentVenue={setCurrentVenue}
-            height={"calc(100vh - 120px)"}
+            height={"calc(100dvh - 120px)"}
           />
         </div>
       </div>
