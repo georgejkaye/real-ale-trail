@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Black Country Ales Real Ale Trail tracker",
     start_url: "/",
     display: "standalone",
-    background_color: "#ffffff",
-    theme_color: "#000000",
+    background_color: "#f9eed2",
+    theme_color: "#282e54",
     icons: [
       {
         src: "/web-app-manifest-192x192.png",
