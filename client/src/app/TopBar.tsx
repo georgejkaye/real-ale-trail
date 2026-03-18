@@ -20,7 +20,7 @@ const TopBar = () => {
           </Link>
         </div>
         {!isLoadingUser && (
-          <>
+          <div className="flex flex-row gap-4">
             <div className="hidden md:flex flex-row gap-4">
               <Link className={linkStyle} href="/">
                 Map
@@ -31,22 +31,25 @@ const TopBar = () => {
               <Link className={linkStyle} href="/users">
                 Users
               </Link>
-              {user ? (
-                <>
-                  <div className={linkStyle} onClick={onClickLogout}>
-                    Logout
-                  </div>
-                  <Link href={`/users/${user.user_id}`} className="font-bold">
-                    {user.display_name}
-                  </Link>
-                </>
-              ) : (
-                <Link className={linkStyle} href="/login">
-                  Login
-                </Link>
-              )}
             </div>
-          </>
+            {user ? (
+              <>
+                <div className={linkStyle} onClick={onClickLogout}>
+                  Logout
+                </div>
+                <Link
+                  className="hidden md:flex font-bold"
+                  href={`/users/${user.user_id}`}
+                >
+                  {user.display_name}
+                </Link>
+              </>
+            ) : (
+              <Link className={linkStyle} href="/login">
+                Login
+              </Link>
+            )}
+          </div>
         )}
       </div>
     </div>
