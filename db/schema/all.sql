@@ -48,13 +48,11 @@ CREATE TABLE crawl_venue (
 CREATE TABLE visit (
     visit_id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
-    crawl_id INTEGER NOT NULL,
     venue_id INTEGER NOT NULL,
     visit_date TIMESTAMP WITH TIME ZONE,
     notes TEXT,
     rating INTEGER,
     drink TEXT,
     FOREIGN KEY (user_id) REFERENCES app_user(user_id),
-    FOREIGN KEY (crawl_id) REFERENCES crawl(crawl_id),
     FOREIGN KEY (venue_id) REFERENCES venue(venue_id)
 );

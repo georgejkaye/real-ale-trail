@@ -50,17 +50,3 @@ SELECT
     1,
     venue_id
 FROM venue;
-
-ALTER TABLE visit
-ADD COLUMN IF NOT EXISTS crawl_id INTEGER;
-
-ALTER TABLE visit
-ADD CONSTRAINT fk_visit_crawl_id
-FOREIGN KEY (crawl_id)
-REFERENCES crawl(crawl_id);
-
-UPDATE visit
-SET crawl_id = 1;
-
-ALTER TABLE visit
-ALTER COLUMN crawl_id SET NOT NULL;
