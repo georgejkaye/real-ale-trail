@@ -206,45 +206,75 @@ SELECT
     venue.venue_address,
     venue.latitude,
     venue.longitude,
-    COALESCE(visit_data_table.visits, ARRAY[]::venue_visit_data[]) AS visits
+    COALESCE(venue_visit.visits, ARRAY[]::venue_visit_data[]) AS visits
 FROM venue
 LEFT JOIN (
     SELECT
-        visit_table.venue_id,
-        ARRAY_AGG((
-            visit_table.visit_id,
-            visit_table.user_id,
-            visit_table.display_name,
-            visit_table.visit_date,
-            visit_table.notes,
-            visit_table.rating,
-            visit_table.drink)::venue_visit_data
-            ORDER BY visit_table.visit_date
+        visit_view.venue_id,
+        ARRAY_AGG(
+            (
+                visit_view.visit_id,
+                visit_view.user_id,
+                visit_view.display_name,
+                visit_view.visit_date,
+                visit_view.notes,
+                visit_view.rating,
+                visit_view.drink,
+                visit_view.crawls
+            )::venue_visit_data
         ) AS visits
-    FROM (
-        SELECT
-            venue.venue_id,
-            visit.visit_id,
-            app_user.user_id,
-            app_user.display_name,
-            visit.visit_date,
-            visit.notes,
-            visit.rating,
-            visit.drink
-        FROM venue
-        INNER JOIN visit
-        ON venue.venue_id = visit.venue_id
-        INNER JOIN app_user
-        ON visit.user_id = app_user.user_id
-    ) visit_table
-    GROUP BY visit_table.venue_id
-) visit_data_table
-ON venue.venue_id = visit_data_table.venue_id
+    FROM visit_view
+    GROUP BY visit_view.venue_id
+) venue_visit
+ON venue.venue_id = venue_visit.venue_id
 ORDER BY venue.venue_name ASC;
 $$;
 
+CREATE OR REPLACE FUNCTION select_venues_by_crawl_id (
+    p_crawl_id INTEGER_NOTNULL
+)
+RETURNS SETOF crawl_venue_data
+LANGUAGE sql
+AS
+$$
+SELECT
+    venue.venue_id,
+    venue.venue_name,
+    venue.venue_address,
+    venue.latitude,
+    venue.longitude,
+    COALESCE(venue_visit.visits, ARRAY[]::crawl_venue_visit_data[]) AS visits
+FROM venue
+LEFT JOIN (
+    SELECT
+        visit_view.venue_id,
+        ARRAY_AGG(
+            (
+                visit_view.visit_id,
+                visit_view.user_id,
+                visit_view.display_name,
+                visit_view.visit_date,
+                visit_view.notes,
+                visit_view.rating,
+                visit_view.drink
+            )::crawl_venue_visit_data
+        ) AS visits
+    FROM visit_view
+    INNER JOIN crawl_visit
+    ON visit_view.visit_id = crawl_visit.visit_id
+    WHERE crawl_visit.crawl_id = p_crawl_id
+    GROUP BY visit_view.venue_id
+) venue_visit
+ON venue.venue_id = venue_visit.venue_id
+INNER JOIN crawl_venue
+ON venue.venue_id = crawl_venue.venue_id
+WHERE crawl_venue.crawl_id = p_crawl_id
+ORDER BY venue.venue_name ASC;
+$$;
+
+
 CREATE OR REPLACE FUNCTION select_venue_by_venue_id (
-    p_venue_id INTEGER
+    p_venue_id INTEGER_NOTNULL
 )
 RETURNS SETOF venue_data
 LANGUAGE sql
@@ -256,47 +286,34 @@ SELECT
     venue.venue_address,
     venue.latitude,
     venue.longitude,
-    COALESCE(visit_data_table.visits, ARRAY[]::venue_visit_data[]) AS visits
+    COALESCE(venue_visit.visits, ARRAY[]::venue_visit_data[]) AS visits
 FROM venue
 LEFT JOIN (
     SELECT
-        visit_table.venue_id,
-        ARRAY_AGG((
-            visit_table.visit_id,
-            visit_table.user_id,
-            visit_table.display_name,
-            visit_table.visit_date,
-            visit_table.notes,
-            visit_table.rating,
-            visit_table.drink)::venue_visit_data
-            ORDER BY visit_table.visit_date
+        visit_view.venue_id,
+        ARRAY_AGG(
+            (
+                visit_view.visit_id,
+                visit_view.user_id,
+                visit_view.display_name,
+                visit_view.visit_date,
+                visit_view.notes,
+                visit_view.rating,
+                visit_view.drink,
+                visit_view.crawls
+            )::venue_visit_data
         ) AS visits
-    FROM (
-        SELECT
-            venue.venue_id,
-            visit.visit_id,
-            app_user.user_id,
-            app_user.display_name,
-            visit.visit_date,
-            visit.notes,
-            visit.rating,
-            visit.drink
-        FROM venue
-        INNER JOIN visit
-        ON venue.venue_id = visit.venue_id
-        INNER JOIN app_user
-        ON visit.user_id = app_user.user_id
-    ) visit_table
-    GROUP BY visit_table.venue_id
-) visit_data_table
-ON venue.venue_id = visit_data_table.venue_id
+    FROM visit_view
+    GROUP BY visit_view.venue_id
+) venue_visit
+ON venue.venue_id = venue_visit.venue_id
 WHERE venue.venue_id = p_venue_id;
 $$;
 
 CREATE OR REPLACE FUNCTION select_venues_by_user (
-    p_user_id INTEGER
+    p_user_id INTEGER_NOTNULL
 )
-RETURNS SETOF venue_data
+RETURNS SETOF user_venue_data
 LANGUAGE sql
 AS
 $$
@@ -306,41 +323,26 @@ SELECT
     venue.venue_address,
     venue.latitude,
     venue.longitude,
-    COALESCE(visit_data_table.visits, ARRAY[]::venue_visit_data[]) AS visits
+    venue_visit.visits
 FROM venue
-LEFT JOIN (
+INNER JOIN (
     SELECT
-        visit_table.venue_id,
-        ARRAY_AGG((
-            visit_table.visit_id,
-            visit_table.user_id,
-            visit_table.display_name,
-            visit_table.visit_date,
-            visit_table.notes,
-            visit_table.rating,
-            visit_table.drink)::venue_visit_data
-            ORDER BY visit_table.visit_date
+        visit_view.venue_id,
+        ARRAY_AGG(
+            (
+                visit_view.visit_id,
+                visit_view.visit_date,
+                visit_view.notes,
+                visit_view.rating,
+                visit_view.drink,
+                visit_view.crawls
+            )::user_venue_visit_data
         ) AS visits
-    FROM (
-        SELECT
-            venue.venue_id,
-            visit.visit_id,
-            app_user.user_id,
-            app_user.display_name,
-            visit.visit_date,
-            visit.notes,
-            visit.rating,
-            visit.drink
-        FROM venue
-        INNER JOIN visit
-        ON venue.venue_id = visit.venue_id
-        INNER JOIN app_user
-        ON visit.user_id = app_user.user_id
-        WHERE app_user.user_id = p_user_id
-    ) visit_table
-    GROUP BY visit_table.venue_id
-) visit_data_table
-ON venue.venue_id = visit_data_table.venue_id;
+    FROM visit_view
+    WHERE visit_view.user_id = p_user_id
+    GROUP BY visit_view.venue_id
+) venue_visit
+ON venue.venue_id = venue_visit.venue_id;
 $$;
 
 CREATE OR REPLACE FUNCTION select_visits ()
@@ -349,20 +351,40 @@ LANGUAGE sql
 AS
 $$
 SELECT
-    visit.visit_id,
-    visit.user_id,
-    app_user.display_name,
-    venue.venue_id,
-    venue.venue_name,
-    visit.visit_date,
-    visit.notes,
-    visit.rating,
-    visit.drink
-FROM visit
-INNER JOIN venue
-ON visit.venue_id = venue.venue_id
-INNER JOIN app_user
-ON visit.user_id = app_user.user_id;
+    visit_view.visit_id,
+    visit_view.user_id,
+    visit_view.display_name,
+    visit_view.venue_id,
+    visit_view.venue_name,
+    visit_view.visit_date,
+    visit_view.notes,
+    visit_view.rating,
+    visit_view.drink,
+    visit_view.crawls
+FROM visit_view;
+$$;
+
+CREATE OR REPLACE FUNCTION select_visits_by_crawl_id (
+    p_crawl_id INTEGER_NOTNULL
+)
+RETURNS SETOF crawl_visit_data
+LANGUAGE sql
+AS
+$$
+SELECT
+    visit_view.visit_id,
+    visit_view.user_id,
+    visit_view.display_name,
+    visit_view.venue_id,
+    visit_view.venue_name,
+    visit_view.visit_date,
+    visit_view.notes,
+    visit_view.rating,
+    visit_view.drink
+FROM visit_view
+INNER JOIN crawl_visit
+ON visit_view.visit_id = crawl_visit.visit_id
+WHERE crawl_visit.crawl_id = p_crawl_id;
 $$;
 
 CREATE OR REPLACE FUNCTION select_visit (
@@ -373,18 +395,16 @@ LANGUAGE sql
 AS
 $$
 SELECT
-    visit.visit_id,
-    visit.user_id,
-    venue.venue_id,
-    venue.venue_name,
-    visit.visit_date,
-    visit.notes,
-    visit.rating,
-    visit.drink
-FROM visit
-INNER JOIN venue
-ON visit.venue_id = venue.venue_id
-WHERE visit.visit_id = p_visit_id;
+    visit_view.visit_id,
+    visit_view.user_id,
+    visit_view.venue_id,
+    visit_view.venue_name,
+    visit_view.visit_date,
+    visit_view.notes,
+    visit_view.rating,
+    visit_view.drink,
+    visit_view.crawls
+FROM visit_view
 $$;
 
 CREATE OR REPLACE FUNCTION select_user_summary (
@@ -397,27 +417,46 @@ $$
 SELECT
     app_user.user_id,
     app_user.display_name,
-    COALESCE(visit_table.visits, ARRAY[]::single_user_visit_data[])
+    COALESCE(user_visit.visits, ARRAY[]::single_user_visit_data[])
 FROM app_user
 LEFT JOIN (
     SELECT
         visit.user_id,
-        ARRAY_AGG((
-            visit.visit_id,
-            venue.venue_id,
-            venue.venue_name,
-            visit.visit_date,
-            visit.notes,
-            visit.rating,
-            visit.drink)::single_user_visit_data
+        ARRAY_AGG(
+            (
+                visit.visit_id,
+                venue.venue_id,
+                venue.venue_name,
+                visit.visit_date,
+                visit.notes,
+                visit.rating,
+                visit.drink,
+                visit_crawl.crawls
+            )::single_user_visit_data
             ORDER BY visit.visit_date
         ) AS visits
     FROM visit
     INNER JOIN venue
     ON visit.venue_id = venue.venue_id
+    INNER JOIN (
+        SELECT
+            crawl_visit.visit_id,
+            ARRAY_AGG(
+                (
+                    crawl_visit.crawl_id,
+                    crawl.crawl_name
+                )::visit_crawl_data
+                ORDER BY crawl_visit.crawl_id
+            ) AS crawls
+        FROM crawl_visit
+        INNER JOIN crawl
+        ON crawl_visit.crawl_id = crawl.crawl_id
+        GROUP BY crawl_visit.visit_id
+    ) visit_crawl
+    ON visit.visit_id = visit_crawl.visit_id
     GROUP BY visit.user_id
-) visit_table
-ON app_user.user_id = visit_table.user_id
+) user_visit
+ON app_user.user_id = user_visit.user_id
 WHERE app_user.user_id = p_user_id;
 $$;
 
@@ -429,45 +468,78 @@ $$
 SELECT
     app_user.user_id,
     app_user.display_name,
-    COALESCE(visit_count_table.visit_count, 0),
-    COALESCE(visit_count_table.unique_visit_count, 0),
-    user_favourite.venue_name
+    user_crawl_agg.crawls
 FROM app_user
 LEFT JOIN (
     SELECT
-        visit.user_id,
-        COUNT(visit.*) AS visit_count,
-        COUNT(DISTINCT venue_id) AS unique_visit_count
-    FROM visit
-    GROUP BY user_id
-) visit_count_table
-ON app_user.user_id = visit_count_table.user_id
-LEFT JOIN (
-    SELECT
-        user_favourite_id.user_id,
-        venue.venue_name
+        user_crawl.user_id,
+        ARRAY_AGG(
+            (
+                user_crawl.crawl_id,
+                user_crawl.crawl_name,
+                user_crawl.visit_count,
+                user_crawl.unique_visit_count,
+                user_crawl.favourite_venue
+            )::user_crawl_count_data
+        ) AS crawls
     FROM (
         SELECT
-            DISTINCT ON(visit.user_id)
-            visit.user_id,
-            venue_id
-        FROM visit
-        INNER JOIN (
+            user_crawl_count.user_id,
+            user_crawl_count.crawl_id,
+            crawl.crawl_name,
+            user_crawl_count.visit_count,
+            user_crawl_count.unique_visit_count,
+            user_crawl_favourite.venue_name AS favourite_venue
+        FROM (
             SELECT
-                user_id,
-                MAX(rating) AS rating
-            FROM visit
-            GROUP BY user_id
-        ) user_max_rating
-        ON visit.user_id = user_max_rating.user_id
-        AND visit.rating = user_max_rating.rating
-        ORDER BY visit.user_id, visit_date
-    ) user_favourite_id
-    INNER JOIN venue
-    ON user_favourite_id.venue_id = venue.venue_id
-) user_favourite
-ON app_user.user_id = user_favourite.user_id
+                crawl_visit.user_id,
+                crawl_visit.crawl_id,
+                COUNT(crawl_visit.*) AS visit_count,
+                COUNT(DISTINCT crawl_visit.venue_id) AS unique_visit_count
+            FROM crawl_visit
+            GROUP BY crawl_visit.user_id, crawl_visit.crawl_id
+        ) user_crawl_count
+        INNER JOIN crawl
+        ON user_crawl_count.crawl_id = crawl.crawl_id
+        INNER JOIN user_crawl_favourite
+        ON user_crawl_count.crawl_id = user_crawl_favourite.crawl_id
+        AND user_crawl_count.user_id = user_crawl_favourite.user_id
+    ) user_crawl
+    GROUP BY user_crawl.user_id
+) user_crawl_agg
+ON app_user.user_id = user_crawl_agg.user_id
 ORDER BY app_user.user_id;
+$$;
+
+CREATE OR REPLACE FUNCTION select_crawls ()
+RETURNS SETOF crawl_data
+LANGUAGE sql
+AS
+$$
+SELECT
+    crawl.crawl_id,
+    crawl.crawl_name,
+    crawl.crawl_dates,
+    crawl.is_public,
+    crawl.crawl_bg,
+    crawl.crawl_fg,
+    crawl_venue_agg.venues
+FROM crawl
+INNER JOIN (
+    SELECT
+        crawl_venue.crawl_id,
+        ARRAY_AGG(
+            (
+                venue.venue_id,
+                venue.venue_name
+            )::crawl_venue_short_data
+        ) AS venues
+    FROM crawl_venue
+    INNER JOIN venue
+    ON crawl_venue.venue_id = venue.venue_id
+    GROUP BY crawl_venue.crawl_id
+) crawl_venue_agg
+ON crawl.crawl_id = crawl_venue_agg.crawl_id;
 $$;
 
 CREATE OR REPLACE FUNCTION update_user (
