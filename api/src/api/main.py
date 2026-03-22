@@ -5,6 +5,7 @@ import uvicorn
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi_users import FastAPIUsers
 
+import api.db.functions.all as db
 from api.db.functions.all import (
     insert_visit_fetchone,
     select_user_counts_fetchall,
@@ -128,6 +129,14 @@ async def patch_visit(
     user: FastApiUser = Depends(current_user),
 ) -> None:
     update_visit(get_db_connection(), user.id, visit_id, notes, rating, drink)
+
+
+@app.delete("/visit/{visit_id}", summary="Delete a visit", tags=["visit"])
+async def delete_visit(
+    visit_id: int,
+    user: FastApiUser = Depends(current_user),
+) -> None:
+    db.delete_visit(get_db_connection(), user.id, visit_id)
 
 
 app.include_router(
