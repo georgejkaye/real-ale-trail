@@ -81,7 +81,7 @@ CREATE TYPE user_count_data AS (
     display_name TEXT_NOTNULL,
     visit_count INTEGER_NOTNULL,
     unique_visit_count INTEGER_NOTNULL,
-    favourite_venue TEXT_NOTNULL
+    favourite_venue TEXT
 );
 
 CREATE TYPE insert_visit_result AS (

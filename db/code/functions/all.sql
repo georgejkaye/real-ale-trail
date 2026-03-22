@@ -155,6 +155,19 @@ WHERE visit_id = p_visit_id
 AND user_id = p_user_id;
 $$;
 
+CREATE OR REPLACE FUNCTION delete_visit (
+    p_user_id INTEGER_NOTNULL,
+    p_visit_id INTEGER_NOTNULL
+)
+RETURNS VOID
+LANGUAGE sql
+AS
+$$
+DELETE FROM visit
+WHERE user_id = p_user_id
+AND visit_id = p_visit_id;
+$$;
+
 CREATE OR REPLACE FUNCTION select_user_by_user_id (
     p_user_id INTEGER
 )

@@ -38,6 +38,7 @@ const Page = ({ params }: { params: Promise<{ visitId: string }> }) => {
         return client.invalidateQueries(
           "/users/{user_id}",
           "/venues",
+          "/venues/{venue_id}",
           "/auth/me",
         )
       },
