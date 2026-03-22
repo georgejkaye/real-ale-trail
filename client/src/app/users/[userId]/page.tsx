@@ -113,8 +113,8 @@ const Page = () => {
         <div className="w-full flex flex-col gap-4">
           <h2 className="font-bold text-2xl">{userSummary.display_name}</h2>
           <div>
-            {userSummary.visits.length}{" "}
-            {userSummary.visits.length === 1 ? "venue" : "venues"} visited
+            {userVenueVisitIds.length} venue
+            {userVenueVisitIds.length === 1 ? "" : "s"} visited
           </div>
           {venues && venues.length > 0 && (
             <VenueMap venues={venues} userVenueVisitIds={userVenueVisitIds} />
