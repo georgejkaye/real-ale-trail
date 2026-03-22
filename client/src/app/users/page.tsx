@@ -16,10 +16,12 @@ const UserCard = ({ user }: UserCardProps) => {
       <div className="bg-accent p-4 rounded-xl text-accentfg flex flex-col md:flex-col gap-4">
         <div className="flex flex-row items-center flex-1">
           <div className="text-xl font-bold flex-1">{user.display_name}</div>
-          <div className="flex flex-row gap-2 items-center">
-            <FaStar />
-            {user.favourite_venue}
-          </div>
+          {user.favourite_venue && (
+            <div className="flex flex-row gap-2 items-center">
+              <FaStar />
+              {user.favourite_venue}
+            </div>
+          )}
         </div>
         <div className="flex flex-row items-center gap-4">
           <div>
