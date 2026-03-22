@@ -112,9 +112,20 @@ const Page = () => {
       ) : (
         <div className="w-full flex flex-col gap-4">
           <h2 className="font-bold text-2xl">{userSummary.display_name}</h2>
-          <div>
-            {userSummary.visits.length}{" "}
-            {userSummary.visits.length === 1 ? "venue" : "venues"} visited
+          <div className="flex flex-row gap-4">
+            <div>
+              <span className="font-bold text-xl">
+                {userVenueVisitIds.length}
+              </span>{" "}
+              venue
+              {userVenueVisitIds.length === 1 ? "" : "s"}
+            </div>
+            <div>
+              <span className="font-bold text-xl">
+                {userSummary.visits.length}
+              </span>{" "}
+              visit{userSummary.visits.length === 1 ? "" : "s"}
+            </div>
           </div>
           {venues && venues.length > 0 && (
             <VenueMap venues={venues} userVenueVisitIds={userVenueVisitIds} />

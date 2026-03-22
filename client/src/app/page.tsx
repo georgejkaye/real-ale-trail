@@ -20,7 +20,7 @@ const VisitStatsPane = ({
       <span className="text-lg font-bold">
         {currentVenueCount}/{totalVenueCount}
       </span>{" "}
-      venues visited
+      venue{totalVenueCount > 1 ? "s" : ""} visited
     </div>
   )
 }
