@@ -19,6 +19,7 @@ import { useContext, useRef } from "react"
 import { Loader } from "@/app/components/Loader"
 import { VenueVisit } from "@/app/api/client"
 import VisitCard from "@/app/components/VisitCard"
+import { getAverageRating } from "@/app/utils"
 
 interface VenueMapProps {
   venueId: number
@@ -88,10 +89,10 @@ const VenueDetails = ({
   latitude,
 }: VenueDetailsProps) => {
   const venueVisitCount = visits.length
-  const averageVenueRating =
-    venueVisitCount === 0
-      ? 0
-      : visits.reduce((a, b) => a + (b.rating ?? 0), 0) / venueVisitCount
+  const averageVenueRating = getAverageRating(visits)
+  venueVisitCount === 0
+    ? 0
+    : visits.reduce((a, b) => a + (b.rating ?? 0), 0) / venueVisitCount
   return (
     <div className="flex flex-col gap-4">
       <h2 className="text-2xl font-bold">{venueName}</h2>

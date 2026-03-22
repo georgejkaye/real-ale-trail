@@ -42,9 +42,9 @@ const Page = () => {
         query: {
           venue_id: venue.venue_id,
           visit_date: new Date(Date.now()).toISOString(),
-          notes: notesText,
-          rating: ratingValue,
-          drink: drinkText,
+          notes: notesText === "" ? null : notesText,
+          rating: ratingValue === 0 ? null : ratingValue,
+          drink: drinkText === "" ? null : drinkText,
         },
       }
       postVisit({ params, headers: { Authorization: `Bearer ${token}` } })

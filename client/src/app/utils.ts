@@ -9,11 +9,22 @@ export const getFirstVisitToVenue = (user: User, venue: Venue) =>
         : 0,
     )[0]
 
-export const getAverageRating = (venue: Venue) =>
-  venue.visits.length === 0
-    ? 0
-    : venue.visits.reduce((acc, cur) => acc + (cur.rating ?? 0), 0) /
-      venue.visits.length
+interface Rated {
+  rating: number | null
+}
+
+export const getAverageRating = (ratings: Rated[]) => {
+  const initialRatingsArray: number[] = []
+  const nonZeroRatings = ratings.reduce(
+    (acc, cur) => (cur.rating === null ? acc : [...acc, cur.rating]),
+    initialRatingsArray,
+  )
+  return (
+    (ratings.length === 0
+      ? 0
+      : nonZeroRatings.reduce((acc, cur) => acc + cur)) / nonZeroRatings.length
+  )
+}
 
 // https://stackoverflow.com/a/18883819
 

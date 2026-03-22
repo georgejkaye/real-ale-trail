@@ -19,12 +19,7 @@ interface VenueCardProps {
 
 const VenueCard = ({ venue, location }: VenueCardProps) => {
   const visitCount = venue.visits.length
-  const venueAverageRating =
-    visitCount === 0
-      ? 0
-      : !venue.visits
-        ? 0
-        : venue.visits.reduce((a, b) => a + (b.rating ?? 0), 0) / visitCount
+  const venueAverageRating = getAverageRating(venue.visits)
   const distanceToVenue = location
     ? getDistanceToVenue(venue, location)
     : undefined

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException
@@ -110,9 +111,9 @@ async def get_visit(visit_id: int) -> VisitData:
 async def post_visit(
     venue_id: int,
     visit_date: datetime,
-    notes: str,
-    rating: int,
-    drink: str,
+    notes: Optional[str],
+    rating: Optional[int],
+    drink: Optional[str],
     user: FastApiUser = Depends(current_user),
 ) -> None:
     insert_visit_fetchone(

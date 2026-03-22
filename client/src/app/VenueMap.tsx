@@ -30,7 +30,7 @@ import { LinkButton } from "./components/forms"
 import { useRouter } from "next/navigation"
 import { Rating } from "@smastrom/react-rating"
 import Link from "next/link"
-import { getFirstVisitToVenue } from "./utils"
+import { getAverageRating, getFirstVisitToVenue } from "./utils"
 import bbox from "@turf/bbox"
 import { SingleUserVisit, User, Venue, VenueVisit } from "./api/client"
 
@@ -112,13 +112,7 @@ const CurrentVenueBox = ({
 }: CurrentVenueBoxProps) => {
   const router = useRouter()
   const venueVisitCount = venue.visits.length
-  const averageVenueRating =
-    venueVisitCount === 0
-      ? 0
-      : venue.visits.reduce(
-          (a: number, b: VenueVisit) => a + (b.rating ?? 0),
-          0,
-        ) / venueVisitCount
+  const averageVenueRating = getAverageRating(venue.visits)
   const onClickDetails = () => {
     router.push(`/venues/${venue.venue_id}`)
   }

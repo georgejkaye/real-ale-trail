@@ -67,7 +67,9 @@ const VisitCardCore = ({
       {review.notes && review.notes !== "" && (
         <div>&apos;{review.notes}&apos;</div>
       )}
-      <Rating style={{ maxWidth: 100 }} value={review.rating ?? 0} readOnly />
+      {review.rating !== null && (
+        <Rating style={{ maxWidth: 100 }} value={review.rating} readOnly />
+      )}
       {isCurrentUser && (
         <div className="flex flex-row gap-4">
           <Link
