@@ -41,7 +41,7 @@ const Page = () => {
       const params = {
         query: {
           venue_id: venue.venue_id,
-          visit_date: new Date(Date.now()).toISOStringnonZeroRatings
+          visit_date: new Date(Date.now()).toISOString(),
           notes: notesText === "" ? null : notesText,
           rating: ratingValue === 0 ? null : ratingValue,
           drink: drinkText === "" ? null : drinkText,
