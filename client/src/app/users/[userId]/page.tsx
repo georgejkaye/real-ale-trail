@@ -118,7 +118,7 @@ const Page = () => {
                 {userVenueVisitIds.length}
               </span>{" "}
               venue
-              {userVenueVisitIds.length === 1 ? "" : "s"} visited
+              {userVenueVisitIds.length === 1 ? "" : "s"}
             </div>
             <div>
               <span className="font-bold text-xl">
