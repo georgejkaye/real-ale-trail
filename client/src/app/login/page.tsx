@@ -100,7 +100,7 @@ const Page = () => {
     })
   }
   return (
-    <div className="flex flex-col md:w-1/2 lg:w-1/3 md:mx-auto p-4 items-center">
+    <div className="flex flex-col md:w-2/3 lg:w-1/3 md:mx-auto p-4 items-center">
       {(successString == "" && user) || isLoadingUser || isPendingPostLogin ? (
         <Loader />
       ) : successString !== "" ? (
