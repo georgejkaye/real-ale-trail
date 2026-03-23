@@ -28,6 +28,9 @@ const TopBar = () => {
               <Link className={linkStyle} href="/venues/list">
                 Venues
               </Link>
+              <Link className={linkStyle} href="/visits">
+                Visits
+              </Link>
               <Link className={linkStyle} href="/users">
                 Users
               </Link>

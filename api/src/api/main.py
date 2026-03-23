@@ -22,7 +22,6 @@ from api.db.types.all import (
     SingleUserVisitData,
     UserCountData,
     UserSummaryData,
-    UserVisitData,
     VenueData,
     VisitData,
 )
@@ -90,7 +89,7 @@ async def get_venue_by_id(venue_id: int) -> VenueData:
 
 
 @app.get("/visits", summary="Get all the visits", tags=["visit"])
-async def get_visits() -> list[UserVisitData]:
+async def get_visits() -> list[VisitData]:
     return select_visits_fetchall(get_db_connection())
 
 

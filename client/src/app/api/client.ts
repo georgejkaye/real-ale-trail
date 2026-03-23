@@ -12,5 +12,6 @@ export type UserCount = components["schemas"]["UserCountData"]
 export type Venue = components["schemas"]["VenueData"]
 export type VenueVisit = components["schemas"]["VenueVisitData"]
 export type SingleUserVisit = components["schemas"]["SingleUserVisitData"]
+export type Visit = components["schemas"]["VisitData"]
 
 export default fetchClient

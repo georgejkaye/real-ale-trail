@@ -20,4 +20,5 @@ jobs:
             cd ${{ vars.PROJECT_ROOT }}
             git pull
             docker compose -f docker-compose.prod.yml down
+            sleep 5
             docker compose -f docker-compose.prod.yml up --build -d

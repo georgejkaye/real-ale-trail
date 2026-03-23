@@ -5,6 +5,7 @@ import { ClientContext } from "../api/ReactQueryClientProvider"
 import { Loader } from "../components/Loader"
 import { UserCount } from "../api/client"
 import { FaStar } from "react-icons/fa"
+import Link from "next/link"
 
 interface UserCardProps {
   user: UserCount
@@ -15,11 +16,21 @@ const UserCard = ({ user }: UserCardProps) => {
     <div className="flex flex-col gap-4">
       <div className="bg-accent p-4 rounded-xl text-accentfg flex flex-col md:flex-col gap-4">
         <div className="flex flex-row items-center flex-1">
-          <div className="text-xl font-bold flex-1">{user.display_name}</div>
+          <Link
+            className="text-xl font-bold flex-1 hover:underline"
+            href={`/users/${user.user_id}`}
+          >
+            {user.display_name}
+          </Link>
           {user.favourite_venue && (
             <div className="flex flex-row gap-2 items-center">
               <FaStar />
-              {user.favourite_venue}
+              <Link
+                className="hover:underline"
+                href={`/venues/${user.favourite_venue_id}`}
+              >
+                {user.favourite_venue}
+              </Link>
             </div>
           )}
         </div>

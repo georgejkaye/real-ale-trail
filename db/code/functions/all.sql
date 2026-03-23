@@ -357,14 +357,14 @@ ON venue.venue_id = visit_data_table.venue_id;
 $$;
 
 CREATE OR REPLACE FUNCTION select_visits ()
-RETURNS SETOF user_visit_data
+RETURNS SETOF visit_data
 LANGUAGE sql
 AS
 $$
 SELECT
     visit.visit_id,
     visit.user_id,
-    app_user.display_name,
+    app_user.display_name AS user_display_name,
     venue.venue_id,
     venue.venue_name,
     visit.visit_date,
@@ -388,6 +388,7 @@ $$
 SELECT
     visit.visit_id,
     visit.user_id,
+    app_user.display_name AS user_display_name,
     venue.venue_id,
     venue.venue_name,
     visit.visit_date,
@@ -397,6 +398,8 @@ SELECT
 FROM visit
 INNER JOIN venue
 ON visit.venue_id = venue.venue_id
+INNER JOIN app_user
+ON visit.user_id = app_user.user_id
 WHERE visit.visit_id = p_visit_id;
 $$;
 
@@ -444,7 +447,8 @@ SELECT
     app_user.display_name,
     COALESCE(visit_count_table.visit_count, 0),
     COALESCE(visit_count_table.unique_visit_count, 0),
-    user_favourite.venue_name
+    user_favourite.venue_name,
+    user_favourite.venue_id
 FROM app_user
 LEFT JOIN (
     SELECT
@@ -458,6 +462,7 @@ ON app_user.user_id = visit_count_table.user_id
 LEFT JOIN (
     SELECT
         user_favourite_id.user_id,
+        venue.venue_id,
         venue.venue_name
     FROM (
         SELECT
