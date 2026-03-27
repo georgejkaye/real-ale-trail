@@ -50,3 +50,11 @@ SELECT
     1,
     venue_id
 FROM venue;
+
+CREATE TABLE IF NOT EXISTS venue_fact (
+    venue_fact_id SERIAL PRIMARY KEY,
+    venue_id INTEGER NOT NULL,
+    fact_key TEXT NOT NULL,
+    fact_value TEXT NOT NULL,
+    FOREIGN KEY (venue_id) REFERENCES venue(venue_id)
+);
