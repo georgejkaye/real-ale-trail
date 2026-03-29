@@ -1,31 +1,34 @@
+DROP DOMAIN IF EXISTS visit_crawl_data_notnull CASCADE;
+DROP DOMAIN IF EXISTS venue_visit_data_notnull CASCADE;
+DROP DOMAIN IF EXISTS venue_crawl_data_notnull CASCADE;
+DROP DOMAIN IF EXISTS venue_fact_data_notnull CASCADE;
+DROP DOMAIN IF EXISTS user_venue_visit_data_notnull CASCADE;
+DROP DOMAIN IF EXISTS crawl_venue_short_data_notnull CASCADE;
+
 DROP TYPE IF EXISTS user_data CASCADE;
 DROP TYPE IF EXISTS visit_crawl_data CASCADE;
-DROP TYPE IF EXISTS user_crawl_count_data CASCADE;
-DROP TYPE IF EXISTS user_count_data CASCADE;
+DROP TYPE IF EXISTS venue_visit_data CASCADE;
+DROP TYPE IF EXISTS crawl_venue_visit_data CASCADE;
 DROP TYPE IF EXISTS crawl_input_data CASCADE;
 DROP TYPE IF EXISTS venue_crawl_data CASCADE;
-DROP DOMAIN IF EXISTS venue_crawl_data_notnull CASCADE;
 DROP TYPE IF EXISTS venue_fact_data CASCADE;
-DROP DOMAIN IF EXISTS venue_fact_data_notnull CASCADE;
 DROP TYPE IF EXISTS venue_input_data CASCADE;
 DROP TYPE IF EXISTS venue_data CASCADE;
+DROP TYPE IF EXISTS single_venue_data CASCADE;
 DROP TYPE IF EXISTS crawl_venue_data CASCADE;
-DROP TYPE IF EXISTS crawl_venue_visit_data CASCADE;
-DROP TYPE IF EXISTS venue_visit_data CASCADE;
-DROP TYPE IF EXISTS user_summary_data CASCADE;
 DROP TYPE IF EXISTS user_visit_data CASCADE;
 DROP TYPE IF EXISTS crawl_visit_data CASCADE;
 DROP TYPE IF EXISTS user_venue_visit_data CASCADE;
-DROP DOMAIN IF EXISTS user_venue_visit_data_notnull CASCADE;
 DROP TYPE IF EXISTS user_venue_data CASCADE;
 DROP TYPE IF EXISTS single_user_visit_data CASCADE;
-DROP TYPE IF EXISTS user_high_level_summary_data CASCADE;
+DROP TYPE IF EXISTS user_summary_data CASCADE;
+DROP TYPE IF EXISTS user_crawl_count_data CASCADE;
+DROP TYPE IF EXISTS user_count_data CASCADE;
 DROP TYPE IF EXISTS insert_venue_result CASCADE;
 DROP TYPE IF EXISTS insert_crawl_result CASCADE;
 DROP TYPE IF EXISTS insert_visit_result CASCADE;
 DROP TYPE IF EXISTS visit_data CASCADE;
 DROP TYPE IF EXISTS crawl_venue_short_data CASCADE;
-DROP DOMAIN IF EXISTS crawl_venue_short_data_notnull CASCADE;
 DROP TYPE IF EXISTS crawl_data CASCADE;
 
 CREATE TYPE user_data AS (
@@ -108,6 +111,18 @@ CREATE TYPE venue_input_data AS (
 );
 
 CREATE TYPE venue_data AS (
+    venue_id INTEGER_NOTNULL,
+    venue_name TEXT_NOTNULL,
+    venue_address TEXT_NOTNULL,
+    latitude DECIMAL_NOTNULL,
+    longitude DECIMAL_NOTNULL,
+    crawls venue_crawl_data_notnull[],
+    users_visited INTEGER_NOTNULL,
+    total_visits INTEGER_NOTNULL,
+    facts venue_fact_data_notnull[]
+);
+
+CREATE TYPE single_venue_data AS (
     venue_id INTEGER_NOTNULL,
     venue_name TEXT_NOTNULL,
     venue_address TEXT_NOTNULL,

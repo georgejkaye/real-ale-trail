@@ -338,10 +338,8 @@ SELECT
         venue_crawl.crawls,
         ARRAY[]::venue_crawl_data_notnull[]
     ) AS crawls,
-    COALESCE(
-        venue_visit.visits,
-        ARRAY[]::venue_visit_data_notnull[]
-    ) AS visits,
+    COALESCE(visit_count.users_visited, 0) AS users_visited,
+    COALESCE(visit_count.total_visits, 0) AS total_visits,
     COALESCE(
         venue_fact.facts,
         ARRAY[]::venue_fact_data_notnull[]
@@ -370,23 +368,13 @@ LEFT JOIN (
 ON venue.venue_id = venue_crawl.venue_id
 LEFT JOIN (
     SELECT
-        visit_view.venue_id,
-        ARRAY_AGG(
-            (
-                visit_view.visit_id,
-                visit_view.user_id,
-                visit_view.display_name,
-                visit_view.visit_date,
-                visit_view.notes,
-                visit_view.rating,
-                visit_view.drink,
-                visit_view.crawls
-            )::venue_visit_data
-        ) AS visits
-    FROM visit_view
-    GROUP BY visit_view.venue_id
-) venue_visit
-ON venue.venue_id = venue_visit.venue_id
+        visit.venue_id,
+        COUNT(DISTINCT user_id) AS users_visited,
+        COUNT(*) AS total_visits
+    FROM visit
+    GROUP BY visit.venue_id
+) visit_count
+ON venue.venue_id = visit_count.venue_id
 LEFT JOIN (
     SELECT
         venue_fact.venue_id,
@@ -450,7 +438,7 @@ CREATE OR REPLACE FUNCTION select_venue_by_venue_id (
     p_user_id INTEGER,
     p_venue_id INTEGER_NOTNULL
 )
-RETURNS SETOF venue_data
+RETURNS SETOF single_venue_data
 LANGUAGE SQL
 AS
 $$
