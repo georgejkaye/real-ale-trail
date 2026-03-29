@@ -340,6 +340,7 @@ SELECT
     ) AS crawls,
     COALESCE(visit_count.users_visited, 0) AS users_visited,
     COALESCE(visit_count.total_visits, 0) AS total_visits,
+    visit_count.average_rating,
     COALESCE(
         venue_fact.facts,
         ARRAY[]::venue_fact_data_notnull[]
@@ -370,7 +371,8 @@ LEFT JOIN (
     SELECT
         visit.venue_id,
         COUNT(DISTINCT user_id) AS users_visited,
-        COUNT(*) AS total_visits
+        COUNT(*) AS total_visits,
+        ROUND(AVG(rating), 2) AS average_rating
     FROM visit
     GROUP BY visit.venue_id
 ) visit_count

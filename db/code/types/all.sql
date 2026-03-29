@@ -119,6 +119,7 @@ CREATE TYPE venue_data AS (
     crawls venue_crawl_data_notnull[],
     users_visited INTEGER_NOTNULL,
     total_visits INTEGER_NOTNULL,
+    average_rating INTEGER,
     facts venue_fact_data_notnull[]
 );
 
