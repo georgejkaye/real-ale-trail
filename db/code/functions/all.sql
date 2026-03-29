@@ -1,4 +1,6 @@
 DROP FUNCTION IF EXISTS insert_user;
+DROP FUNCTION IF EXISTS insert_crawl;
+DROP FUNCTION IF EXISTS insert_crawls;
 DROP FUNCTION IF EXISTS insert_venue;
 DROP FUNCTION IF EXISTS insert_venues;
 DROP FUNCTION IF EXISTS insert_visit;
@@ -52,38 +54,76 @@ RETURNING (
 $$;
 
 CREATE OR REPLACE FUNCTION insert_crawl (
-    p_crawl_id INTEGER_NOTNULL,
     p_crawl_name TEXT_NOTNULL,
     p_start_date TIMESTAMP_NOTNULL,
     p_end_date TIMESTAMP_NOTNULL,
     p_is_public BOOLEAN_NOTNULL,
-    p_end_data TIMESTAMP_NOTNULL,
     p_crawl_bg TEXT,
     p_crawl_fg TEXT
+)
+RETURNS SETOF insert_crawl_result
+LANGUAGE PLPGSQL
+AS
+$$
+DECLARE
+    v_existing_crawl_id INTEGER_NOTNULL := -1;
+BEGIN
+    IF EXISTS(SELECT * FROM crawl WHERE crawl_name = p_crawl_name)
+    THEN
+        SELECT crawl_id INTO v_existing_crawl_id
+        FROM crawl
+        WHERE crawl_name = p_crawl_name;
+
+        RETURN QUERY SELECT v_existing_crawl_id;
+    ELSE
+        INSERT INTO crawl (
+            crawl_name,
+            crawl_dates,
+            is_public,
+            crawl_bg,
+            crawl_fg
+        )
+        VALUES (
+            p_crawl_name,
+            DATERANGE(
+                DATE_TRUNC('day', p_start_date)::date,
+                DATE_TRUNC('day', p_end_date)::date
+            ),
+            p_is_public,
+            p_crawl_bg,
+            p_crawl_fg
+        )
+        RETURNING crawl_id INTO v_existing_crawl_id;
+
+        RETURN QUERY SELECT v_existing_crawl_id;
+    END IF;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION insert_crawls (
+    p_crawls crawl_input_data[]
 )
 RETURNS VOID
 LANGUAGE SQL
 AS
 $$
 INSERT INTO crawl (
-    crawl_id,
     crawl_name,
     crawl_dates,
     is_public,
     crawl_bg,
     crawl_fg
 )
-VALUES (
-    p_crawl_id,
-    p_crawl_name,
+SELECT
+    v_crawl.crawl_name,
     DATERANGE(
-        DATE_TRUNC('day', p_start_date)::date,
-        DATE_TRUNC('day', p_end_date)::date
+        DATE_TRUNC('day', v_crawl.start_date)::date,
+        DATE_TRUNC('day', V_crawl.end_date)::date
     ),
-    p_is_public,
-    p_crawl_bg,
-    p_crawl_fg
-);
+    v_crawl.is_public,
+    v_crawl.crawl_bg,
+    v_crawl.crawl_fg
+FROM UNNEST(p_crawls) AS v_crawl;
 $$;
 
 CREATE OR REPLACE FUNCTION insert_venue (
@@ -128,22 +168,7 @@ $$
 DECLARE
     v_venue_id INTEGER_NOTNULL := -1;
 BEGIN
-    INSERT INTO venue (
-        venue_name,
-        venue_address,
-        latitude,
-        longitude
-    )
-    SELECT
-        v_venue.venue_name,
-        v_venue.venue_address,
-        v_venue.latitude,
-        v_venue.longitude
-    FROM UNNEST(p_venues) AS v_venue
-    ON CONFLICT (venue_name, venue_address) DO NOTHING
-    RETURNING venue_id INTO v_venue_id;
-
-    FOR i IN 1 .. p_venues.COUNT LOOP
+    FOR i IN 1 .. CARDINALITY(p_venues) LOOP
         INSERT INTO venue (
             venue_name,
             venue_address,
@@ -151,10 +176,10 @@ BEGIN
             longitude
         )
         VALUES (
-            (p_venues(i)).venue_name,
-            (p_venues(i)).venue_address,
-            (p_venues(i)).latitude,
-            (p_venues(i)).longitude
+            (p_venues[i]).venue_name,
+            (p_venues[i]).venue_address,
+            (p_venues[i]).latitude,
+            (p_venues[i]).longitude
         )
         ON CONFLICT (venue_name, venue_address) DO NOTHING
         RETURNING venue_id INTO v_venue_id;
@@ -166,7 +191,7 @@ BEGIN
         SELECT
             v_crawl_id,
             v_venue_id
-        FROM UNNEST((p_venues(i)).crawl_ids)
+        FROM UNNEST((p_venues[i]).crawl_ids)
         AS v_crawl_id;
     END LOOP;
 END;
