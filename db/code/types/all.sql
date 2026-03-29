@@ -2,6 +2,7 @@ DROP TYPE IF EXISTS user_data CASCADE;
 DROP TYPE IF EXISTS visit_crawl_data CASCADE;
 DROP TYPE IF EXISTS user_crawl_count_data CASCADE;
 DROP TYPE IF EXISTS user_count_data CASCADE;
+DROP TYPE IF EXISTS crawl_input_data CASCADE;
 DROP TYPE IF EXISTS venue_input_data CASCADE;
 DROP TYPE IF EXISTS venue_data CASCADE;
 DROP TYPE IF EXISTS crawl_venue_data CASCADE;
@@ -15,6 +16,7 @@ DROP TYPE IF EXISTS user_venue_data CASCADE;
 DROP TYPE IF EXISTS single_user_visit_data CASCADE;
 DROP TYPE IF EXISTS user_follow_data CASCADE;
 DROP TYPE IF EXISTS user_high_level_summary_data CASCADE;
+DROP TYPE IF EXISTS insert_crawl_result CASCADE;
 DROP TYPE IF EXISTS insert_visit_result CASCADE;
 DROP TYPE IF EXISTS visit_data CASCADE;
 DROP TYPE IF EXISTS crawl_venue_short_data CASCADE;
@@ -55,6 +57,15 @@ CREATE TYPE crawl_venue_visit_data AS (
     notes TEXT,
     rating INTEGER,
     drink TEXT
+);
+
+CREATE TYPE crawl_input_data AS (
+    crawl_name TEXT_NOTNULL,
+    start_date TIMESTAMP_NOTNULL,
+    end_date TIMESTAMP_NOTNULL,
+    is_public BOOLEAN_NOTNULL,
+    crawl_bg TEXT,
+    crawl_fg TEXT
 );
 
 CREATE TYPE venue_input_data AS (
@@ -155,6 +166,10 @@ CREATE TYPE user_count_data AS (
     user_id INTEGER_NOTNULL,
     display_name TEXT_NOTNULL,
     crawls user_crawl_count_data[]
+);
+
+CREATE TYPE insert_crawl_result AS (
+    crawl_id INTEGER_NOTNULL
 );
 
 CREATE TYPE insert_visit_result AS (
