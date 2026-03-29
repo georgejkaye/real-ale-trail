@@ -5,7 +5,7 @@ from datetime import datetime
 from psycopg import Connection
 
 from api.db.functions.all import insert_crawl_fetchone, insert_venues
-from api.db.types.all import VenueInputData
+from api.db.types.all import VenueFactData, VenueInputData
 from api.db.types.register import register_types
 from api.utils import get_secret_file_contents
 
@@ -52,6 +52,7 @@ for venue in venue_json:
             venue["latitude"],
             venue["longitude"],
             [crawl_lookup[key] for key in venue["crawls"]],
+            [VenueFactData(key, value) for (key, value) in venue["facts"].items()],
         )
     )
 
