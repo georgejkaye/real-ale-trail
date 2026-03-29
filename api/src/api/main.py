@@ -146,9 +146,9 @@ async def get_crawl_visits(crawl_id: int) -> list[CrawlVisitData]:
 async def post_visit(
     venue_id: int,
     visit_date: datetime,
-    notes: Optional[str],
-    rating: Optional[int],
-    drink: Optional[str],
+    notes: Optional[str] = None,
+    rating: Optional[int] = None,
+    drink: Optional[str] = None,
     user: FastApiUser = Depends(current_user),
 ) -> None:
     insert_visit_fetchone(
