@@ -65,13 +65,21 @@ const Page = () => {
   const nameDescendingSort = (a: Venue, b: Venue) =>
     -sortByName(a.venue_name, b.venue_name)
   const visitsAscendingSort = (a: Venue, b: Venue) =>
-    a.visits.length - b.visits.length
+    a.total_visits - b.total_visits
   const visitsDescendingSort = (a: Venue, b: Venue) =>
-    b.visits.length - a.visits.length
+    b.total_visits - a.total_visits
+  const usersAscendingSort = (a: Venue, b: Venue) =>
+    a.users_visited - b.users_visited
+  const usersDescendingSort = (a: Venue, b: Venue) =>
+    b.users_visited - a.users_visited
   const ratingAscendingSort = (a: Venue, b: Venue) =>
-    getAverageRating(a.visits) - getAverageRating(b.visits)
+    !a.average_rating || !b.average_rating
+      ? 0
+      : a.average_rating - b.average_rating
   const ratingDescendingSort = (a: Venue, b: Venue) =>
-    getAverageRating(b.visits) - getAverageRating(a.visits)
+    !a.average_rating || !b.average_rating
+      ? 0
+      : b.average_rating - a.average_rating
   const distanceAscendingSort = useCallback(
     (a: Venue, b: Venue) => {
       if (!location) {
@@ -116,13 +124,17 @@ const Page = () => {
             ? visitsAscendingSort
             : sortByValue === "visits-desc"
               ? visitsDescendingSort
-              : sortByValue === "rating-asc"
-                ? ratingAscendingSort
-                : sortByValue === "rating-desc"
-                  ? ratingDescendingSort
-                  : sortByValue === "distance-asc"
-                    ? distanceAscendingSort
-                    : distanceDescendingSort
+              : sortByValue === "users-asc"
+                ? usersAscendingSort
+                : sortByValue === "users-desc"
+                  ? usersDescendingSort
+                  : sortByValue === "rating-asc"
+                    ? ratingAscendingSort
+                    : sortByValue === "rating-desc"
+                      ? ratingDescendingSort
+                      : sortByValue === "distance-asc"
+                        ? distanceAscendingSort
+                        : distanceDescendingSort
     const filterAndSortVenues = (venueArray: Venue[]) =>
       venueArray
         .filter(
@@ -182,6 +194,8 @@ const Page = () => {
             <option value="name-desc">Z-A</option>
             <option value="visits-desc">Visits (high-low)</option>
             <option value="visits-asc">Visits (low-high)</option>
+            <option value="users-desc">Users (high-low)</option>
+            <option value="users-asc">Users (low-high)</option>
             <option value="rating-desc">Rating (high-low)</option>
             <option value="rating-asc">Rating (low-high)</option>
             {location && (
