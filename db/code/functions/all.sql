@@ -321,7 +321,9 @@ FROM app_user
 WHERE app_user.email = p_email;
 $$;
 
-CREATE OR REPLACE FUNCTION select_venues ()
+CREATE OR REPLACE FUNCTION select_venues (
+    p_user_id INTEGER
+)
 RETURNS SETOF venue_data
 LANGUAGE SQL
 AS
@@ -332,9 +334,40 @@ SELECT
     venue.venue_address,
     venue.latitude,
     venue.longitude,
-    COALESCE(venue_visit.visits, ARRAY[]::venue_visit_data[]) AS visits,
-    COALESCE(venue_fact.facts, ARRAY[]::venue_fact_data[]) AS facts
+    COALESCE(
+        venue_crawl.crawls,
+        ARRAY[]::venue_crawl_data_notnull[]
+    ) AS crawls,
+    COALESCE(
+        venue_visit.visits,
+        ARRAY[]::venue_visit_data_notnull[]
+    ) AS visits,
+    COALESCE(
+        venue_fact.facts,
+        ARRAY[]::venue_fact_data_notnull[]
+    ) AS facts
 FROM venue
+LEFT JOIN (
+    SELECT
+        crawl_venue.venue_id,
+        ARRAY_AGG(
+            (
+                crawl.crawl_id,
+                crawl.crawl_name,
+                LOWER(crawl.crawl_dates),
+                UPPER(crawl.crawl_dates)
+            )::venue_crawl_data
+            ORDER BY crawl.crawl_dates
+        ) AS crawls
+    FROM crawl_venue
+    INNER JOIN crawl
+    ON crawl_venue.crawl_id = crawl.crawl_id
+    LEFT JOIN crawl_user
+    ON crawl.crawl_id = crawl_user.crawl_id
+    WHERE p_user_id IS NULL OR crawl_user.user_id = p_user_id
+    GROUP BY crawl_venue.venue_id
+) venue_crawl
+ON venue.venue_id = venue_crawl.venue_id
 LEFT JOIN (
     SELECT
         visit_view.venue_id,
@@ -362,12 +395,12 @@ LEFT JOIN (
                 venue_fact.fact_key,
                 venue_fact.fact_value
             )::venue_fact_data
+            ORDER BY venue_fact.fact_key
         ) AS facts
     FROM venue_fact
     GROUP BY venue_fact.venue_id
 ) venue_fact
-ON venue.venue_id = venue_fact.venue_id
-ORDER BY venue.venue_name ASC;
+ON venue.venue_id = venue_fact.venue_id;
 $$;
 
 CREATE OR REPLACE FUNCTION select_venues_by_crawl_id (
@@ -414,6 +447,7 @@ $$;
 
 
 CREATE OR REPLACE FUNCTION select_venue_by_venue_id (
+    p_user_id INTEGER,
     p_venue_id INTEGER_NOTNULL
 )
 RETURNS SETOF venue_data
@@ -426,9 +460,30 @@ SELECT
     venue.venue_address,
     venue.latitude,
     venue.longitude,
-    COALESCE(venue_visit.visits, ARRAY[]::venue_visit_data[]) AS visits,
-    COALESCE(venue_fact.facts, ARRAY[]::venue_fact_data[]) AS facts
+    COALESCE(venue_crawl.crawls, ARRAY[]::venue_crawl_data_notnull[]) AS crawls,
+    COALESCE(venue_visit.visits, ARRAY[]::venue_visit_data_notnull[]) AS visits,
+    COALESCE(venue_fact.facts, ARRAY[]::venue_fact_data_notnull[]) AS facts
 FROM venue
+LEFT JOIN (
+    SELECT
+        crawl_venue.venue_id,
+        ARRAY_AGG(
+            (
+                crawl.crawl_id,
+                crawl.crawl_name,
+                LOWER(crawl.crawl_dates),
+                UPPER(crawl.crawl_dates)
+            )::venue_crawl_data
+        ) AS crawls
+    FROM crawl_venue
+    INNER JOIN crawl
+    ON crawl_venue.crawl_id = crawl.crawl_id
+    LEFT JOIN crawl_user
+    ON crawl.crawl_id = crawl_user.crawl_id
+    WHERE p_user_id IS NULL OR crawl_user.user_id = p_user_id
+    GROUP BY crawl_venue.venue_id
+) venue_crawl
+ON venue.venue_id = venue_crawl.venue_id
 LEFT JOIN (
     SELECT
         visit_view.venue_id,
@@ -477,8 +532,29 @@ SELECT
     venue.venue_address,
     venue.latitude,
     venue.longitude,
-    venue_visit.visits
+    COALESCE(venue_crawl.crawls, ARRAY[]::venue_crawl_data_notnull[]) AS visits,
+    COALESCE(venue_visit.visits, ARRAY[]::user_venue_visit_data_notnull[]) AS visits
 FROM venue
+LEFT JOIN (
+    SELECT
+        crawl_venue.venue_id,
+        ARRAY_AGG(
+            (
+                crawl.crawl_id,
+                crawl.crawl_name,
+                LOWER(crawl.crawl_dates),
+                UPPER(crawl.crawl_dates)
+            )::venue_crawl_data
+        ) AS crawls
+    FROM crawl_venue
+    INNER JOIN crawl
+    ON crawl_venue.crawl_id = crawl.crawl_id
+    LEFT JOIN crawl_user
+    ON crawl.crawl_id = crawl_user.crawl_id
+    WHERE p_user_id IS NULL OR crawl_user.user_id = p_user_id
+    GROUP BY crawl_venue.venue_id
+) venue_crawl
+ON venue.venue_id = venue_crawl.venue_id
 INNER JOIN (
     SELECT
         visit_view.venue_id,
@@ -675,7 +751,8 @@ $$
 SELECT
     crawl.crawl_id,
     crawl.crawl_name,
-    crawl.crawl_dates,
+    LOWER(crawl.crawl_dates) AS crawl_start,
+    UPPER(crawl.crawl_dates) AS crawl_end,
     crawl.is_public,
     crawl.crawl_bg,
     crawl.crawl_fg,
