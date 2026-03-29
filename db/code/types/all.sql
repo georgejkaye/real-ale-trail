@@ -94,7 +94,8 @@ CREATE TYPE venue_data AS (
     venue_address TEXT_NOTNULL,
     latitude DECIMAL_NOTNULL,
     longitude DECIMAL_NOTNULL,
-    visits venue_visit_data[]
+    visits venue_visit_data_notnull[],
+    facts venue_fact_data_notnull[]
 );
 
 CREATE TYPE crawl_venue_data AS (

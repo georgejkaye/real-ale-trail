@@ -332,7 +332,8 @@ SELECT
     venue.venue_address,
     venue.latitude,
     venue.longitude,
-    COALESCE(venue_visit.visits, ARRAY[]::venue_visit_data[]) AS visits
+    COALESCE(venue_visit.visits, ARRAY[]::venue_visit_data[]) AS visits,
+    COALESCE(venue_fact.facts, ARRAY[]::venue_fact_data[]) AS facts
 FROM venue
 LEFT JOIN (
     SELECT
@@ -353,6 +354,19 @@ LEFT JOIN (
     GROUP BY visit_view.venue_id
 ) venue_visit
 ON venue.venue_id = venue_visit.venue_id
+LEFT JOIN (
+    SELECT
+        venue_fact.venue_id,
+        ARRAY_AGG(
+            (
+                venue_fact.fact_key,
+                venue_fact.fact_value
+            )::venue_fact_data
+        ) AS facts
+    FROM venue_fact
+    GROUP BY venue_fact.venue_id
+) venue_fact
+ON venue.venue_id = venue_fact.venue_id
 ORDER BY venue.venue_name ASC;
 $$;
 
@@ -412,7 +426,8 @@ SELECT
     venue.venue_address,
     venue.latitude,
     venue.longitude,
-    COALESCE(venue_visit.visits, ARRAY[]::venue_visit_data[]) AS visits
+    COALESCE(venue_visit.visits, ARRAY[]::venue_visit_data[]) AS visits,
+    COALESCE(venue_fact.facts, ARRAY[]::venue_fact_data[]) AS facts
 FROM venue
 LEFT JOIN (
     SELECT
@@ -433,6 +448,19 @@ LEFT JOIN (
     GROUP BY visit_view.venue_id
 ) venue_visit
 ON venue.venue_id = venue_visit.venue_id
+LEFT JOIN (
+    SELECT
+        venue_fact.venue_id,
+        ARRAY_AGG(
+            (
+                venue_fact.fact_key,
+                venue_fact.fact_value
+            )::venue_fact_data
+        ) AS facts
+    FROM venue_fact
+    GROUP BY venue_fact.venue_id
+) venue_fact
+ON venue.venue_id = venue_fact.venue_id
 WHERE venue.venue_id = p_venue_id;
 $$;
 
