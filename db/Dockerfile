@@ -1,6 +1,13 @@
 FROM postgres:latest
 
-COPY ./init.sh /init.sh
+
+WORKDIR /db
+
+COPY init.sh .
+COPY schema schema
+COPY data data
+COPY code code
+
 RUN chmod +x ./init.sh
 
-ENTRYPOINT [ "/init.sh" ]
+RUN ./init.sh

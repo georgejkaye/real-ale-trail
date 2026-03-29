@@ -1,14 +1,6 @@
 #!/bin/sh
 
-DB_POPULATE_DIR=/db/.populate
-
-if [ ! -d $DB_POPULATE_DIR ]
-then
-    mkdir $DB_POPULATE_DIR
-else
-    rm $DB_POPULATE_DIR/*
-fi
-
+DB_POPULATE_DIR=/docker-entrypoint-initdb.d
 DB_SCHEMA_DIR="/db/schema"
 
 if [ ! -d $DB_SCHEMA_DIR ]
