@@ -354,7 +354,9 @@ LEFT JOIN (
                 crawl.crawl_id,
                 crawl.crawl_name,
                 LOWER(crawl.crawl_dates),
-                UPPER(crawl.crawl_dates)
+                UPPER(crawl.crawl_dates),
+                crawl.crawl_bg,
+                crawl.crawl_fg
             )::venue_crawl_data
             ORDER BY crawl.crawl_dates
         ) AS crawls
@@ -462,7 +464,9 @@ LEFT JOIN (
                 crawl.crawl_id,
                 crawl.crawl_name,
                 LOWER(crawl.crawl_dates),
-                UPPER(crawl.crawl_dates)
+                UPPER(crawl.crawl_dates),
+                crawl.crawl_bg,
+                crawl.crawl_fg
             )::venue_crawl_data
         ) AS crawls
     FROM crawl_venue
@@ -533,7 +537,9 @@ LEFT JOIN (
                 crawl.crawl_id,
                 crawl.crawl_name,
                 LOWER(crawl.crawl_dates),
-                UPPER(crawl.crawl_dates)
+                UPPER(crawl.crawl_dates),
+                crawl.crawl_bg,
+                crawl.crawl_fg
             )::venue_crawl_data
         ) AS crawls
     FROM crawl_venue

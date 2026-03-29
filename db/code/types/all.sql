@@ -87,7 +87,9 @@ CREATE TYPE venue_crawl_data AS (
     crawl_id INTEGER_NOTNULL,
     crawl_name TEXT_NOTNULL,
     crawl_start TIMESTAMP WITH TIME ZONE,
-    crawl_end TIMESTAMP WITH TIME ZONE
+    crawl_end TIMESTAMP WITH TIME ZONE,
+    crawl_bg TEXT,
+    crawl_fg TEXT
 );
 
 CREATE DOMAIN venue_crawl_data_notnull
