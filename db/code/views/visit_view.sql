@@ -22,7 +22,9 @@ INNER JOIN (
         ARRAY_AGG(
             (
                 crawl.crawl_id,
-                crawl.crawl_name
+                crawl.crawl_name,
+                crawl.crawl_bg,
+                crawl.crawl_fg
             )::visit_crawl_data
         ) AS crawls
     FROM crawl

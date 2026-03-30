@@ -44,7 +44,9 @@ CREATE TYPE user_data AS (
 
 CREATE TYPE visit_crawl_data AS (
     crawl_id INTEGER_NOTNULL,
-    crawl_name TEXT_NOTNULL
+    crawl_name TEXT_NOTNULL,
+    crawl_bg TEXT,
+    crawl_fg TEXT
 );
 
 CREATE DOMAIN visit_crawl_data_notnull
