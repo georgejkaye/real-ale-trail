@@ -15,5 +15,6 @@ export type VenueCrawl = components["schemas"]["VenueCrawlData"]
 export type VenueVisit = components["schemas"]["VenueVisitData"]
 export type SingleUserVisit = components["schemas"]["SingleUserVisitData"]
 export type Visit = components["schemas"]["VisitData"]
+export type VisitCrawl = components["schemas"]["VisitCrawlData"]
 
 export default fetchClient
